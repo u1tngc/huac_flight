@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール ソロチェック</title>
+    <link rel="stylesheet" href="../static/FL1C0040.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>ソロ前チェック</h2>
+            <form method="post" action="/FL_db041">
+                <div class="data-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>氏名</th>
+                                <th>サブＧ</th>
+                                <th>索切れ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in soloList %}
+                            <tr>
+                                <td>{{ student[0] }}</td>
+                                {%if student[1] == 1 %}
+                                <td style="color: red;">{{ student[2] }}</td>
+                                {% else %}
+                                <td>{{ student[2] }}</td>
+                                {% endif %}
+                                {%if student[3] == 1 %}
+                                <td style="color: red;">{{ student[4] }}</td>
+                                {% else %}
+                                <td>{{ student[4] }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="location.href='/GK_menu01'" class="menu-button">戻る</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

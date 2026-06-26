@@ -1,0 +1,27 @@
+/* サブＧ／索切処置 経歴更新画面 専用スタイル */
+
+/* 新規登録テーブルの列幅 */
+/* 枝番を狭く、コメントを広く調整 */
+.data-table.db-edit-regist th:nth-child(1),
+.data-table.db-edit-regist td:nth-child(1) {
+    width: 22%;
+    /* 実施年月日 */
+}
+
+.data-table.db-edit-regist th:nth-child(2),
+.data-table.db-edit-regist td:nth-child(2) {
+    width: 24%;
+    /* 課目 */
+}
+
+.data-table.db-edit-regist th:nth-child(3),
+.data-table.db-edit-regist td:nth-child(3) {
+    width: 10%;
+    /* 枝番 */
+}
+
+.data-table.db-edit-regist th:nth-child(4),
+.data-table.db-edit-regist td:nth-child(4) {
+    width: 44%;
+    /* コメント */
+}

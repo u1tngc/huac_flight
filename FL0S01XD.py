@@ -18,6 +18,7 @@ DB_CONFIG = {
     "target_session_attrs": "read-write"
 }
 
+
 def get_kamoku(bunya,kbn,bangou):
     try:
         conn = psycopg2.connect(**DB_CONFIG)

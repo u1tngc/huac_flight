@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HUACフライト管理ツール 索切処置経歴更新</title>
     <link rel="stylesheet" href="../static/FL1C0040.css">
+    <link rel="stylesheet" href="../static/FL1C0042.css">
 </head>
 
 <body>
@@ -39,7 +40,7 @@
             <form method="post" action="/FL_db034">
                 <input type="hidden" name="op" value="insert">
                 <div class="data-section">
-                    <table class="data-table">
+                    <table class="data-table db-edit-regist">
                         <thead>
                             <tr>
                                 <th>実施年月日</th>
@@ -58,8 +59,8 @@
                                         {% endfor %}
                                     </select>
                                 </td>
-                                <td><input type="number" name="edaban" value="1" min="1" max="9"
-                                        class="table-input"></td>
+                                <td><input type="number" name="edaban" value="1" min="1" max="9" class="table-input">
+                                </td>
                                 <td><input type="text" name="comment" maxlength="255" class="table-input"></td>
                             </tr>
                         </tbody>
@@ -86,8 +87,8 @@
                         </div>
                         <p class="history-comment"><span class="field-label">枝番</span>{{ list[2] }}</p>
                         <p class="history-comment"><span class="field-label">コメント</span>
-                            <input type="text" name="comment" value="{{ list[5] }}" maxlength="255"
-                                class="table-input"></p>
+                            <input type="text" name="comment" value="{{ list[5] }}" maxlength="255" class="table-input">
+                        </p>
                         <div class="button-group">
                             <button type="submit" class="execute-button">訂正</button>
                         </div>

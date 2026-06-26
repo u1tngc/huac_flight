@@ -78,6 +78,10 @@ def FL_menu01():
             if dbkbn == "2":
                 #機能：ユーザー情報登録
                 return redirect(url_for('FL_db004',err=""))
+        elif shorikbn == "solo_chk":
+            #機能：ソロ前確認
+            soloList = FL1S0001.get_solo_chk()
+            return render_template('FL_db041.html', soloList=soloList)     
         elif shorikbn == "password":
             #機能：パスワード変更
             return redirect(url_for('FL_db010',err=""))
@@ -319,6 +323,14 @@ def FL_db004():
         return redirect(url_for('FL_menu01'))
 
     return render_template('FL_db004.html', err="")
+
+#学生管理セグ・照会
+@app.route('/FL_db041', methods=['GET', 'POST'])
+def FL_db041():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    return render_template('FL_db041.html')
 
 
 if __name__ == "__main__":

@@ -2,7 +2,8 @@
 #PGM-NAME:FLフライト管理履歴サブ
 #最終更新日:2026/06/26
 
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+from dateutil.relativedelta import relativedelta
 
 import FL0S001D
 import FL0S002D
@@ -19,7 +20,7 @@ def get_rireki(id,kbn):
         for ix1 in range(len(list)):
             temp_array = [""]*5
             temp_array[0] = name
-            temp_array[1] = list[ix1][1]
+            temp_array[1] = datetime.strptime(list[ix1][1], "%Y%m%d").strftime("%Y/%m/%d")
             temp_array[2] = FL0S01XD.get_kamoku(list[ix1][2],list[ix1][3],list[ix1][4])
             temp_array[3] = list[ix1][6]
             temp_array[4] = list[ix1][7]
@@ -83,7 +84,8 @@ def regist_rireki(id, ymd, bangou, edaban, comment, user_id, kbn):
     err = check_rireki(ymd, bangou, edaban, comment)
     if err:
         return err
-    insert_data = [id, ymd, "D", str(kbn), bangou, int(edaban), user_id, comment]
+    name = FL0S001D.get_userName(user_id)
+    insert_data = [id, ymd, "D", str(kbn), bangou, int(edaban), name, comment]
     ret = FL0S002D.insert_rireki(insert_data)
     if ret == 3:
         return "同一の履歴が既に登録されています。"
@@ -100,3 +102,35 @@ def correct_rireki(id, ymd, bangou, edaban, comment, kbn):
     if ret != 0:
         return "訂正に失敗しました。"
     return ""
+
+def get_solo_chk():
+    JST = timezone(timedelta(hours=9))
+    kijunYmd =  (datetime.now(JST) - relativedelta(months=3)).strftime("%Y%m%d")
+    gakusei_list = FL0S001D.get_gakuseiInfo01()
+    ret_array = []
+    for ix1 in range(len(gakusei_list)):
+        temp_array = ["",0,"",0,""]
+        subG = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "D", "1")
+        saku = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "D", "2")
+        temp_array[0] = gakusei_list[ix1][1]
+        if not subG:
+            temp_array[1] = 1
+            temp_array[2] = "実施無し"
+        elif subG[1] < kijunYmd:
+            temp_array[1] = 1
+            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%Y/%m/%d")
+        else:
+            temp_array[1] = 0
+            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%Y/%m/%d")
+        if not saku:
+            temp_array[3] = 1
+            temp_array[4] = "実施無し"
+        elif saku[1] < kijunYmd:
+            temp_array[3] = 1
+            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%Y/%m/%d")
+        else:
+            temp_array[3] = 0
+            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%Y/%m/%d")
+        ret_array.append(temp_array)
+    return ret_array
+                
