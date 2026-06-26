@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール サブＧ経歴更新</title>
+    <link rel="stylesheet" href="../static/FL1C0040.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>サブＧ経歴更新</h2>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="err">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            <br>
+            <br>
+            {% endif %}
+            {% endwith %}
+            {% if err %}
+            <a class="err">{{ err }}</a>
+            <br><br>
+            {% endif %}
+            <div class="student-info">
+                <p><strong>氏名:</strong> {{ gakuseiName }}</p>
+            </div>
+
+            <h3>新規登録</h3>
+            <form method="post" action="/FL_db024">
+                <input type="hidden" name="op" value="insert">
+                <div class="data-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>実施年月日</th>
+                                <th>課目</th>
+                                <th>枝番</th>
+                                <th>コメント</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="date" name="ymd" class="table-input"></td>
+                                <td>
+                                    <select name="bangou" class="table-input">
+                                        {% for kamoku in kamokuList %}
+                                        <option value="{{ kamoku[0] }}">{{ kamoku[1] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td><input type="number" name="edaban" value="1" min="1" max="9"
+                                        class="table-input"></td>
+                                <td><input type="text" name="comment" maxlength="255" class="table-input"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="execute-button">登録</button>
+                </div>
+            </form>
+
+            <h3>登録済み履歴の訂正</h3>
+            <div class="history-list">
+                {% for list in rireki %}
+                <form method="post" action="/FL_db024">
+                    <input type="hidden" name="op" value="update">
+                    <input type="hidden" name="ymd" value="{{ list[0] }}">
+                    <input type="hidden" name="bangou" value="{{ list[1] }}">
+                    <input type="hidden" name="edaban" value="{{ list[2] }}">
+                    <div class="history-card">
+                        <div class="history-card-header">
+                            <span class="history-date">{{ list[0] }}</span>
+                            <span class="history-subject">{{ list[3] }}</span>
+                            <span class="history-instructor"><span class="field-label">教官</span>{{ list[4] }}</span>
+                        </div>
+                        <p class="history-comment"><span class="field-label">枝番</span>{{ list[2] }}</p>
+                        <p class="history-comment"><span class="field-label">コメント</span>
+                            <input type="text" name="comment" value="{{ list[5] }}" maxlength="255"
+                                class="table-input"></p>
+                        <div class="button-group">
+                            <button type="submit" class="execute-button">訂正</button>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <p class="history-empty">該当する履歴データがありません。</p>
+                {% endfor %}
+            </div>
+
+            <div class="button-group">
+                <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">Menu</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

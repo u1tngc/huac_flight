@@ -1,6 +1,6 @@
 #PGM-ID:FL1L0000
 #PGM-NAME:FLフライト管理オンラインメイン
-#最終更新日:2026/06/25
+#最終更新日:2026/06/26
 
 from datetime import timedelta
 from datetime import datetime
@@ -50,19 +50,31 @@ def FL_menu01():
                 #機能：サブG履歴照会
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName"] = gakuseiName
-                return render_template('FL_db021.html', gakuseiName=gakuseiName) 
+                return render_template('FL_db021.html', gakuseiName=gakuseiName)
             if dbkbn == "2":
                 #機能：索切処置履歴照会
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName"] = gakuseiName
                 return render_template('FL_db031.html', gakuseiName=gakuseiName)
+        elif shorikbn == "db_edit":
+            dbkbn = request.form["db_kbn2"]
+            if dbkbn == "1":
+                #機能：サブG経歴更新
+                gakuseiName = FL1S0001.get_gakuseiInfo01()
+                session[f"{user_id}_gakuseiName"] = gakuseiName
+                return render_template('FL_db023.html', gakuseiName=gakuseiName)
+            if dbkbn == "2":
+                #機能：索切処置経歴更新
+                gakuseiName = FL1S0001.get_gakuseiInfo01()
+                session[f"{user_id}_gakuseiName"] = gakuseiName
+                return render_template('FL_db033.html', gakuseiName=gakuseiName)
         elif shorikbn == "user_edit":
             dbkbn = request.form["db_kbn3"]
             if dbkbn == "1":
                 #機能：ユーザー情報訂正
                 userData = FL1S0002.get_user01()
                 session[f"{user_id}_userData"] = userData
-                return render_template('FL_db002.html', userData=userData, err1="") 
+                return render_template('FL_db002.html', userData=userData, err1="")
             if dbkbn == "2":
                 #機能：ユーザー情報登録
                 return redirect(url_for('FL_db004',err=""))
@@ -76,17 +88,17 @@ def FL_menu01():
 def FL_db010():
     user_id = session.get('user_id')
     if not session.get('logged_in'):
-        return redirect(url_for('FL_login'))  
-    if request.method == 'POST':  
+        return redirect(url_for('FL_login'))
+    if request.method == 'POST':
         pass1 = request.form['pass1']
         pass2 = request.form['pass2']
         err = FL1S0002.check03(pass1, pass2)
         if err:
-            return render_template('FL_db010.html', err =err)   
+            return render_template('FL_db010.html', err =err)
         err = FL1S0002.update_password(user_id,pass1)
         flash(f"{user_id}のパスワード変更が完了しました。")
         return redirect(url_for('FL_menu01'))
-    return render_template('FL_db010.html', err ="")  
+    return render_template('FL_db010.html', err ="")
 
 #サブG履歴照会１
 @app.route('/FL_db021', methods=['GET', 'POST'])
@@ -95,13 +107,13 @@ def FL_db021():
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
     if f"{user_id}_gakuseiName" not in session:
-        return redirect(url_for('FL_menu01'))   
+        return redirect(url_for('FL_menu01'))
     if request.method == 'POST':
         gakuseiID = request.form['selected_student']
         session[f'{user_id}_gakuseiID'] = gakuseiID
         rireki = FL1S0001.get_rireki(gakuseiID,1)
         session[f'{user_id}_rireki'] = rireki
-        return redirect(url_for('FL_db022'))  
+        return redirect(url_for('FL_db022'))
     return render_template('FL_db021.html', gakuseiName=session.get(f"{user_id}_gakuseiName"))
 
 #サブG履歴照会２
@@ -111,11 +123,11 @@ def FL_db022():
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
     if f"{user_id}_gakuseiID" not in session:
-        return redirect(url_for('FL_menu01'))    
+        return redirect(url_for('FL_menu01'))
     if request.method == 'POST':
         return redirect(url_for('FL_menu01'))
     rireki = session.get(f'{user_id}_rireki')
-    
+
     return render_template('FL_db022.html', rireki=rireki)
 
 #索切履歴照会１
@@ -125,14 +137,14 @@ def FL_db031():
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
     if f"{user_id}_gakuseiName" not in session:
-        return redirect(url_for('FL_menu01'))  
+        return redirect(url_for('FL_menu01'))
     if request.method == 'POST':
         gakuseiID = request.form['selected_student']
         session[f'{user_id}_gakuseiID'] = gakuseiID
         rireki = FL1S0001.get_rireki(gakuseiID,2)
         session[f'{user_id}_rireki'] = rireki
         return redirect(url_for('FL_db032'))
-    
+
     return render_template('FL_db031.html', gakuseiName=session.get(f"{user_id}_gakuseiName"))
 
 #索切履歴照会２
@@ -142,13 +154,106 @@ def FL_db032():
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
     if f"{user_id}_gakuseiID" not in session:
-        return redirect(url_for('FL_menu01')) 
-    
+        return redirect(url_for('FL_menu01'))
+
     if request.method == 'POST':
         return redirect(url_for('FL_menu01'))
     rireki = session.get(f'{user_id}_rireki')
-    
+
     return render_template('FL_db032.html', rireki=rireki)
+
+#サブG経歴更新（学生選択）
+@app.route('/FL_db023', methods=['GET', 'POST'])
+def FL_db023():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiName" not in session:
+        return redirect(url_for('FL_menu01'))
+    if request.method == 'POST':
+        gakuseiID = request.form['selected_student']
+        session[f'{user_id}_gakuseiID'] = gakuseiID
+        return redirect(url_for('FL_db024'))
+    return render_template('FL_db023.html', gakuseiName=session.get(f"{user_id}_gakuseiName"))
+
+#サブG経歴更新（登録・訂正）
+@app.route('/FL_db024', methods=['GET', 'POST'])
+def FL_db024():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiID" not in session:
+        return redirect(url_for('FL_menu01'))
+    gakuseiID = session.get(f'{user_id}_gakuseiID')
+    if request.method == 'POST':
+        op = request.form['op']
+        if op == "insert":
+            ymd = request.form['ymd'].replace('-', '')
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            comment = request.form['comment']
+            err = FL1S0001.regist_rireki(gakuseiID, ymd, bangou, edaban, comment, user_id, 1)
+            if err:
+                return render_template('FL_db024.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 1), kamokuList=FL1S0001.get_kamokuList(1), err=err)
+            flash("登録が完了しました。")
+        elif op == "update":
+            ymd = request.form['ymd']
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            comment = request.form['comment']
+            err = FL1S0001.correct_rireki(gakuseiID, ymd, bangou, edaban, comment, 1)
+            if err:
+                return render_template('FL_db024.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 1), kamokuList=FL1S0001.get_kamokuList(1), err=err)
+            flash("訂正が完了しました。")
+        return redirect(url_for('FL_db024'))
+    return render_template('FL_db024.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 1), kamokuList=FL1S0001.get_kamokuList(1), err="")
+
+#索切処置経歴更新（学生選択）
+@app.route('/FL_db033', methods=['GET', 'POST'])
+def FL_db033():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiName" not in session:
+        return redirect(url_for('FL_menu01'))
+    if request.method == 'POST':
+        gakuseiID = request.form['selected_student']
+        session[f'{user_id}_gakuseiID'] = gakuseiID
+        return redirect(url_for('FL_db034'))
+    return render_template('FL_db033.html', gakuseiName=session.get(f"{user_id}_gakuseiName"))
+
+#索切処置経歴更新（登録・訂正）
+@app.route('/FL_db034', methods=['GET', 'POST'])
+def FL_db034():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiID" not in session:
+        return redirect(url_for('FL_menu01'))
+    gakuseiID = session.get(f'{user_id}_gakuseiID')
+    if request.method == 'POST':
+        op = request.form['op']
+        if op == "insert":
+            ymd = request.form['ymd'].replace('-', '')
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            comment = request.form['comment']
+            err = FL1S0001.regist_rireki(gakuseiID, ymd, bangou, edaban, comment, user_id, 2)
+            if err:
+                return render_template('FL_db034.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 2), kamokuList=FL1S0001.get_kamokuList(2), err=err)
+            flash("登録が完了しました。")
+        elif op == "update":
+            ymd = request.form['ymd']
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            comment = request.form['comment']
+            err = FL1S0001.correct_rireki(gakuseiID, ymd, bangou, edaban, comment, 2)
+            if err:
+                return render_template('FL_db034.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 2), kamokuList=FL1S0001.get_kamokuList(2), err=err)
+            flash("訂正が完了しました。")
+        return redirect(url_for('FL_db034'))
+    return render_template('FL_db034.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 2), kamokuList=FL1S0001.get_kamokuList(2), err="")
+
 
 #ユーザー管理セグ訂正・照会
 @app.route('/FL_db002', methods=['GET', 'POST'])
@@ -158,7 +263,7 @@ def FL_db002():
         return redirect(url_for('FL_login'))
     if not session.get('authority') in [9]:
         return redirect(url_for('FL_menu01'))
-    
+
     if request.method == 'POST':
         userInfo = request.form['selected_userInfo']
         session[f'{user_id}_gakuseiInfo'] = userInfo
@@ -175,21 +280,21 @@ def FL_db003():
         return redirect(url_for('FL_login'))
     if not session.get('authority') in [9]:
         return redirect(url_for('FL_menu01'))
-    
-    if request.method == 'POST':  
+
+    if request.method == 'POST':
         name = request.form['name']
         status_cd = request.form['status_cd']
         err = FL1S0002.check02(name, status_cd)
         if err:
-            return render_template('FL_db003.html', userInfo=session.get(f'{user_id}_user'), err =err)   
+            return render_template('FL_db003.html', userInfo=session.get(f'{user_id}_user'), err =err)
         list = session.get(f'{user_id}_user')
         id = list[0]
         update_user = [id, name, int(status_cd)]
         err = FL1S0002.update_user(update_user)
         err = f"[{name}]の訂正が完了しました。"
         userData = session.get(f"{user_id}_userData")
-        return render_template('FL_db002.html', userData=userData, err1=err) 
-    return render_template('FL_db003.html', userInfo=session.get(f'{user_id}_user'), err ="")      
+        return render_template('FL_db002.html', userData=userData, err1=err)
+    return render_template('FL_db003.html', userInfo=session.get(f'{user_id}_user'), err ="")
 
 #ユーザー管理セグ・登録
 @app.route('/FL_db004', methods=['GET', 'POST'])
@@ -199,21 +304,21 @@ def FL_db004():
         return redirect(url_for('FL_login'))
     if not session.get('authority') in [9]:
         return redirect(url_for('FL_menu01'))
-    
-    if request.method == 'POST':  
+
+    if request.method == 'POST':
         id = request.form['id']
         name = request.form['name']
         status_cd = int(request.form['status_cd'])
         err = FL1S0002.check04(id, name)
         if err:
-            return render_template('FL_db004.html', err =err)   
+            return render_template('FL_db004.html', err =err)
         err = FL1S0002.insert_user(id, name, status_cd)
         if err:
-            return render_template('FL_db004.html', err =err)   
+            return render_template('FL_db004.html', err =err)
         flash("ユーザーの登録が完了しました。")
-        return redirect(url_for('FL_menu01'))        
+        return redirect(url_for('FL_menu01'))
 
-    return render_template('FL_db004.html', err="") 
+    return render_template('FL_db004.html', err="")
 
 
 if __name__ == "__main__":
