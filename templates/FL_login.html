@@ -1,0 +1,41 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール ログイン</title>
+    <link rel="stylesheet" href="../static/FL1C0001.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <header class="login-header">
+            <h1>HUACフライト管理ツール</h1>
+        </header>
+        <main class="login-main">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                <p class="flash-message">{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form class="login-form" method="post" action="/">
+                <div class="input-group">
+                    <label for="password">ユーザーＩＤ</label>
+                    <input type="text" id="user" name="user" placeholder="" required>
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" name="password" placeholder="パスワードを入力" required>
+                </div>
+                <button type="submit" class="login-button">ログイン</button>
+            </form>
+        </main>
+    </div>
+</body>
+
+</html>

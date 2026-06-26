@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール メニュー</title>
+    <link rel="stylesheet" href="../static/FL1C0002.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>機能選択</h2>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="err">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            <br>
+            <br>
+            {% endif %}
+            {% endwith %}
+            <form method="post">
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection" value="db_show">フライト状況照会</label>
+                        <div class="form-group">
+                            <label for="db_kbn1"></label>
+                            <select id="db_kbn1" name="db_kbn1">
+                                <option value="1">サブＧ履歴照会</option>
+                                <option value="2">緊急処置履歴照会</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection" value="db_edit">フライト状況更新</label>
+                        <div class="form-group">
+                            <label for="db_kbn2"></label>
+                            <select id="db_kbn2" name="db_kbn2">
+                                <option value="1">サブＧ経歴更新</option>
+                                <option value="2">緊急操作経歴更新</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% if session['authority'] in [9] %}
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection" value="user_edit">ユーザー管理</label>
+                        <div class="form-group">
+                            <label for="db_kbn3"></label>
+                            <select id="db_kbn3" name="db_kbn3">
+                                {% if session['authority'] in [9] %}
+                                <option value="1">ユーザー情報訂正</option>
+                                <option value="2">ユーザー情報登録</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection" value="password">パスワード変更</label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="execute-button">実行</button>
+                </div>
+            </form>
+        </section>
+
+        <div class="data-section info-section">
+            <div>推奨ブラウザ：Chrome</div>
+            <div>スマホでも使用できるが、画面はPCサイズで出力される。</div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

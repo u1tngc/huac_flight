@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール 学生情報登録</title>
+    <link rel="stylesheet" href="../static/FL1C0041.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>ユーザー情報登録</h2>
+            {% if err %}
+            <a class="err">{{ err }}</a>
+            <br><br>
+            {% endif %}
+            <form method="post" action="/FL_db004">
+                <div class="data-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ユーザーID</th>
+                                <th>氏名</th>
+                                <th>権限</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" name="id" class="table-input"></td>
+                                <td><input type="text" name="name" class="table-input"></td>
+                                <td>
+                                    <select name="status_cd" class="table-input">
+                                        <option value="0">一般学生</option>
+                                        <option value="1">役付学生</option>
+                                        <option value="2">教官</option>
+                                        <option value="3">指導員</option>
+                                        <option value="4">指定養成教官</option>
+                                        <option value="5">監督</option>
+                                        <option value="9">管理者</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">戻る</button>
+                    <button type="submit" class="execute-button">登録</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

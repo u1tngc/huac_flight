@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール ユーザー情報訂正（訂正）</title>
+    <link rel="stylesheet" href="../static/FL1C0041.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>ユーザー情報訂正（訂正）</h2>
+            {% if err %}
+            <a class="err">{{ err }}</a>
+            <br><br>
+            {% endif %}
+            <form method="post" action="/FL_db003">
+                <div class="data-section">
+                    <h3>変更前</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ユーザーID</th>
+                                <th>氏名</th>
+                                <th>権限</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ userInfo[0] }}</td>
+                                <td>{{ userInfo[1] }}</td>
+                                <td>{{ userInfo[2] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="data-section">
+                    <h3>変更後</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ユーザーID</th>
+                                <th>氏名</th>
+                                <th>権限</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ userInfo[0] }}</td> <!-- ユーザーIDは変更不可 -->
+                                <td><input type="text" name="name" value="{{ userInfo[1] }}" class="table-input"></td>
+                                <td>
+                                    <select name="status_cd" class="table-input">
+                                        <option value="0" {% if userInfo[2]=="一般学生" %}selected{% endif %}>一般学生</option>
+                                        <option value="1" {% if userInfo[2]=="役付学生" %}selected{% endif %}>役付学生</option>
+                                        <option value="2" {% if userInfo[2]=="教官" %}selected{% endif %}>教官</option>
+                                        <option value="3" {% if userInfo[2]=="指導員" %}selected{% endif %}>指導員</option>
+                                        <option value="4" {% if userInfo[2]=="指定養成教官" %}selected{% endif %}>指定養成教官
+                                        </option>
+                                        <option value="5" {% if userInfo[2]=="監督" %}selected{% endif %}>監督</option>
+                                        <option value="9" {% if userInfo[2]=="管理者" %}selected{% endif %}>管理者</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">Menu</button>
+                    <button type="submit" class="execute-button">訂正</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

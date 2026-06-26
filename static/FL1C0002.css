@@ -1,0 +1,333 @@
+/* 全体 */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    /* 子要素を縦に並べる */
+    align-items: center;
+    /* 水平方向に中央揃え */
+    justify-content: center;
+    /* 垂直方向に中央揃え */
+}
+
+/* ヘッダー */
+header {
+    background-color: #1e3a8a;
+    /* PANTONE280 */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+/* メインコンテンツ */
+main {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.options {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+}
+
+.options h2 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.data-section {
+    width: 100%;
+}
+
+.data-section .radio-group {
+    padding-left: 20px;
+    /* 全てのラジオボタンを同じ位置に統一 */
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.radio-group input[type="radio"] {
+    margin: 0;
+    transform: scale(1.2);
+    flex-shrink: 0;
+    /* ラジオボタンのサイズを固定 */
+}
+
+.radio-group label {
+    font-size: 1.1em;
+    color: #555;
+    cursor: pointer;
+    text-align: left;
+}
+
+/* 実行ボタン */
+.submit-button {
+    background-color: #3b82f6;
+    /* DIC161に近い色 */
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.submit-button:hover {
+    background-color: #2563eb;
+}
+
+/* フッター */
+footer {
+    background-color: #1e3a8a;
+    /* PANTONE280 */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    width: 100%;
+    text-align: left;
+    padding-left: 20px;
+    /* 左寄りに統一 */
+    margin: 10px 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.form-group select,
+.form-group input[type="number"] {
+    width: calc(100% - 40px);
+    /* padding分を考慮 */
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.form-note {
+    display: block;
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.info-section {
+    text-align: center !important;
+    padding: 20px 0;
+}
+
+/* ラジオボタンエリアの背景 */
+.radio-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #e9ecef;
+}
+
+.radio-section .radio-group {
+    padding-left: 0;
+    margin: 0 0 10px 0;
+}
+
+.radio-section .radio-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* 横並びのフォームグループ */
+.form-horizontal {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding-left: 0;
+    margin: 10px 0;
+}
+
+.form-horizontal .form-group {
+    flex: 1;
+    padding-left: 0;
+    margin: 0;
+}
+
+.form-horizontal .form-group select,
+.form-horizontal .form-group input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+    .data-section .radio-group {
+        padding-left: 10px;
+        /* スマホでは左余白を少なくする */
+    }
+
+    .radio-group label {
+        font-size: 14px;
+    }
+
+    .form-group {
+        padding-left: 10px;
+    }
+
+    .form-group select,
+    .form-group input[type="number"] {
+        width: calc(100% - 20px);
+    }
+
+    /* スマホでも横並びを維持 */
+    .form-horizontal {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        padding-left: 0;
+    }
+
+    .radio-section .radio-group {
+        padding-left: 0;
+    }
+
+    .form-horizontal .form-group {
+        padding-left: 0;
+        flex: 1;
+    }
+
+    .form-horizontal .form-group select,
+    .form-horizontal .form-group input[type="number"] {
+        width: calc(100% - 20px);
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .form-horizontal .form-group label {
+        font-size: 13px;
+    }
+}
+
+.button-group {
+    display: flex;
+    /* 横並びにする */
+    justify-content: center;
+    /* 水平方向の中央配置 */
+    gap: 20px;
+    /* ボタンの間隔 */
+    margin-top: 30px;
+}
+
+.execute-button,
+.menu-button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 10px;
+}
+
+.execute-button {
+    background-color: #3498db;
+    color: white;
+}
+
+.menu-button {
+    background-color: #e67e22;
+    /* 法政オレンジ色 */
+    color: white;
+}
+
+.execute-button:hover,
+.menu-button:hover {
+    opacity: 0.8;
+}
+
+.text-container {
+    white-space: pre-wrap;
+    text-align: center;
+    /* 中央揃え */
+
+    /* 改行を維持しつつ折り返し */
+}
+
+.text-container a {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.err {
+    color: red;
+}
+
+button[value="1"] {
+    background-color: #1e3a8a !important;
+    /* 法政ブルー（正解） - ヘッダーと同色 */
+    color: white !important;
+}
+
+button[value="2"] {
+    background-color: #e67e22 !important;
+    color: white !important;
+    font-size: 20px !important;
+    /* 文字サイズのみ大きく */
+}
+
+button[value="3"] {
+    background-color: #95a5a6 !important;
+    /* グレー（不正解） */
+    color: white !important;
+    font-size: 20px !important;
+    /* 文字サイズのみ大きく */
+}
