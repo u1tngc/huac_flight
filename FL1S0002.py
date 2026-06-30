@@ -6,6 +6,7 @@ import bcrypt
 import re
 
 import FL0S001D
+import FL0S099D
 
 def login_check(user, password):
     user_info = FL0S001D.select_user(user)
@@ -19,6 +20,7 @@ def login_check(user, password):
 
 def update_password(user_id,password):
     err = FL0S001D.update_password(user_id,password)
+    err = FL0S099D.update_userPassword(user_id,password)
     return ""        
     
 def get_user01():
@@ -84,7 +86,7 @@ def update_user(update_user):
     return ""
 
 def insert_user(id, name, status_cd):
-    gakkaData = FL0S001D.select_userGakka(id)
+    gakkaData = FL0S099D.select_userGakka(id)
     print(gakkaData)
     if gakkaData:
         password = gakkaData[5]

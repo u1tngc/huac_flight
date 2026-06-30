@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 import FL0S001D
 import FL0S002D
 import FL0S01XD
+import FL0S099D
 
 def get_rireki(id,kbn):
     if kbn == 1:
@@ -16,7 +17,7 @@ def get_rireki(id,kbn):
         list = FL0S002D.get_rireki(id,"D","2")
     ret_array = []
     if list:
-        name = FL0S001D.get_gakuseiName(id)
+        name = FL0S099D.get_gakuseiName(id)
         for ix1 in range(len(list)):
             temp_array = [""]*5
             temp_array[0] = name
@@ -29,11 +30,11 @@ def get_rireki(id,kbn):
     return ret_array
 
 def get_gakuseiInfo01():
-    ret_array = FL0S001D.get_gakuseiInfo01()
+    ret_array = FL0S099D.get_gakuseiInfo01()
     return ret_array
 
 def get_gakuseiName(id):
-    name = FL0S001D.get_gakuseiName(id)
+    name = FL0S099D.get_gakuseiName(id)
     return name
 
 #更新画面用：課目選択肢（区分別）を取得
@@ -106,7 +107,7 @@ def correct_rireki(id, ymd, bangou, edaban, comment, kbn):
 def get_solo_chk():
     JST = timezone(timedelta(hours=9))
     kijunYmd =  (datetime.now(JST) - relativedelta(months=3)).strftime("%Y%m%d")
-    gakusei_list = FL0S001D.get_gakuseiInfo01()
+    gakusei_list = FL0S099D.get_gakuseiInfo01()
     ret_array = []
     for ix1 in range(len(gakusei_list)):
         temp_array = ["",0,"",0,""]

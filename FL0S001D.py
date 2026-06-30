@@ -56,23 +56,6 @@ def update_password(id, password):
     except Exception as e:
         print(f'エラー内容：{e}')
         return 2
-
-def get_gakuseiName(id):
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)  
-        with conn.cursor() as cur:
-            sql = 'SELECT 氏名 FROM "学生管理セグ" WHERE 学籍番号 = %s'
-            data = (id,)
-            cur.execute(sql, data)
-            result = cur.fetchone()  
-        conn.close()
-        return result[0] if result else ""
-    except psycopg2.Error as e:
-        print(f'エラー内容：{e}')
-        return ""
-    except Exception as e:
-        print(f'エラー内容：{e}')
-        return ""
     
 
 def get_userName(id):
@@ -85,22 +68,6 @@ def get_userName(id):
             result = cur.fetchone()  
         conn.close()
         return result[0] if result else ""
-    except psycopg2.Error as e:
-        print(f'エラー内容：{e}')
-        return ""
-    except Exception as e:
-        print(f'エラー内容：{e}')
-        return ""
-
-def get_gakuseiInfo01():
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)  
-        with conn.cursor() as cur:
-            sql = 'SELECT 学籍番号, 氏名 FROM "学生管理セグ" WHERE 権限 IN (0, 1, 6, 7)'
-            cur.execute(sql)
-            result = cur.fetchall()  
-        conn.close()
-        return [list(row) for row in result]
     except psycopg2.Error as e:
         print(f'エラー内容：{e}')
         return ""
@@ -162,20 +129,3 @@ def insert_user(id, name, status_cd, password):
     finally:
         if conn:
             conn.close() 
-
-def select_userGakka(id):
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)  
-        with conn.cursor() as cur:
-            sql = 'SELECT * FROM "学生管理セグ" WHERE 学籍番号 = %s'
-            data = (id,)
-            cur.execute(sql, data)
-            result = cur.fetchone()  
-        conn.close()
-        return list(result) if result else []
-    except psycopg2.Error as e:
-        print(f'エラー内容：{e}')
-        return []
-    except Exception as e:
-        print(f'エラー内容：{e}')
-        return []
