@@ -83,7 +83,11 @@
                         </tbody>
                     </table>
                     <div class="button-group">
+                        {% if session['authority'] in [0,1] %}
+                        <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">メニューに戻る</button>
+                        {% else %}
                         <button type="button" onclick="location.href='/FL_db051'" class="menu-button">戻る</button>
+                        {% endif %}
                     </div>
             </form>
         </section>

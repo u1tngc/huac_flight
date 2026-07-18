@@ -40,8 +40,12 @@ def get_kamokuList(bunya,kbn):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            sql = 'SELECT 番号, 課目名 FROM "課目cdセグ" WHERE 分野 = %s AND 区分 = %s ORDER BY 番号'
-            data = (bunya,kbn)
+            if kbn == "0":
+                sql = 'SELECT * FROM "課目cdセグ" WHERE 分野 != %s ORDER BY 番号'
+                data = (bunya,)           
+            else:
+                sql = 'SELECT * FROM "課目cdセグ" WHERE 分野 = %s AND 区分 = %s ORDER BY 番号'
+                data = (bunya,kbn)
             cur.execute(sql, data)
             result = cur.fetchall()
         conn.close()

@@ -23,8 +23,12 @@ def get_rireki(id,bunya,kbn):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            sql = 'SELECT * FROM "緊急課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s'
-            data = (id,bunya,kbn)
+            if bunya == "D":
+                sql = 'SELECT * FROM "緊急課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s'
+                data = (id,bunya,kbn)
+            else:
+                sql = 'SELECT * FROM "緊急課目履歴セグ" WHERE 学籍番号 = %s AND 分野 != %s'
+                data = (id,"D")
             cur.execute(sql,data)
             result = cur.fetchall()
         conn.close()

@@ -1,6 +1,6 @@
 #PGM-ID:FL1S0001
 #PGM-NAME:FLフライト管理履歴サブ
-#最終更新日:2026/06/26
+#最終更新日:2026/07/18
 
 from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
@@ -38,18 +38,22 @@ def get_gakuseiName(id):
 
 #更新画面用：課目選択肢（区分別）を取得
 def get_kamokuList(kbn):
-    ret_array = FL0S01XD.get_kamokuList("D", str(kbn))
+    temp_array = FL0S01XD.get_kamokuList("D", str(kbn))
+    ret_array = []
+    for ix1 in range(len(temp_array)):
+        kamoku_no = temp_array[ix1][0]+temp_array[ix1][1]+temp_array[ix1][2]
+        ret_array.append([kamoku_no, temp_array[ix1][3]])
     return ret_array
 
 #更新画面用：キー項目込みの履歴一覧を取得
-def get_rirekiEdit(id, kbn):
-    list = FL0S002D.get_rireki(id, "D", str(kbn))
+def get_rirekiEdit(id, bunya, kbn):
+    list = FL0S002D.get_rireki(id, bunya, str(kbn))
     ret_array = []
     if list:
         for ix1 in range(len(list)):
             temp_array = [""]*6
             temp_array[0] = list[ix1][1]
-            temp_array[1] = list[ix1][4]
+            temp_array[1] = list[ix1][2]+list[ix1][3]+list[ix1][4]
             temp_array[2] = list[ix1][5]
             temp_array[3] = FL0S01XD.get_kamoku(list[ix1][2],list[ix1][3],list[ix1][4])
             temp_array[4] = list[ix1][6]
@@ -73,19 +77,19 @@ def check_rireki(ymd, bangou, edaban, comment):
             return "枝番は1以上の1桁の数字で入力してください。"
     except ValueError:
         return "枝番は半角数字で入力してください。"
-    if len(bangou) != 3:
-        return "課目が正しくありません。"
+    # if len(bangou) != 3:
+    #     return "課目が正しくありません。"
     if len(comment) > 255:
         return "コメントは255字以内で入力してください。"
     return ""
 
 #履歴登録
-def regist_rireki(id, ymd, bangou, edaban, comment, user_id, kbn):
+def regist_rireki(id, ymd, bangou, edaban, comment, user_id):
     err = check_rireki(ymd, bangou, edaban, comment)
     if err:
         return err
     name = FL0S001D.get_userName(user_id)
-    insert_data = [id, ymd, "D", str(kbn), bangou, int(edaban), name, comment]
+    insert_data = [id, ymd, bangou[0:1], bangou[1:2], bangou[2:6], int(edaban), name, comment]
     ret = FL0S002D.insert_rireki(insert_data)
     if ret == 3:
         return "同一の履歴が既に登録されています。"
@@ -94,10 +98,10 @@ def regist_rireki(id, ymd, bangou, edaban, comment, user_id, kbn):
     return ""
 
 #履歴訂正（コメント）
-def correct_rireki(id, ymd, bangou, edaban, comment, kbn):
+def correct_rireki(id, ymd, bunya, kbn, bangou, edaban, comment):
     if len(comment) > 255:
         return "コメントは255字以内で入力してください。"
-    key_data = [id, ymd, "D", str(kbn), bangou, int(edaban)]
+    key_data = [id, ymd, bunya, str(kbn), bangou, int(edaban)]
     ret = FL0S002D.update_rireki(comment, key_data)
     if ret != 0:
         return "訂正に失敗しました。"

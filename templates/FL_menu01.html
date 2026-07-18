@@ -28,6 +28,7 @@
             {% endif %}
             {% endwith %}
             <form method="post">
+                {% if session['authority'] not in [0] %}
                 <div class="data-section">
                     <div class="radio-section">
                         <label class="radio-group"><input type="radio" name="selection" value="db_show">フライト状況照会</label>
@@ -40,19 +41,23 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                {% if session['authority'] not in [0,1] %}
                 <div class="data-section">
                     <div class="radio-section">
                         <label class="radio-group"><input type="radio" name="selection" value="db_edit">フライト状況更新</label>
                         <div class="form-group">
                             <label for="db_kbn2"></label>
                             <select id="db_kbn2" name="db_kbn2">
+                                <option value="0">課目実施履歴登録</option>
                                 <option value="1">サブＧ経歴更新</option>
                                 <option value="2">索切処置経歴更新</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                {% if session['authority'] in [6, 7, 9] %}
+                {% endif %}
+                {% if session['authority'] not in [0] %}
                 <div class="data-section">
                     <div class="radio-section">
                         <label class="radio-group"><input type="radio" name="selection" value="solo_chk">ソロ前確認</label>
