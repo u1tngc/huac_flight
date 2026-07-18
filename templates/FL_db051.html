@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUACフライト管理ツール 1stソロ前CHK（選択）</title>
+    <link rel="stylesheet" href="../static/FL1C0040.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUACフライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>1stソロ前CHK（選択）</h2>
+            <a>照会する学生を選択してください。</a>
+            <form method="post" action="/FL_db051">
+                <div class="data-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>選択</th>
+                                <th>学籍番号</th>
+                                <th>氏名</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in gakuseiName %}
+                            <tr>
+                                <td>
+                                    <input type="radio" name="selected_student" value="{{ student[0] }}"
+                                        id="student_{{ loop.index }}" {% if loop.first %}checked{% endif %}>
+                                </td>
+                                <td>
+                                    <label for="student_{{ loop.index }}">{{ student[0] }}</label>
+                                </td>
+                                <td>
+                                    <label for="student_{{ loop.index }}">{{ student[1] }}</label>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="button-group">
+                    <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">Menu</button>
+                    <button type="submit" class="execute-button">次へ</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+
+    <script>
+        // フォーム送信時に学生が選択されているかチェック
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const selectedStudent = document.querySelector('input[name="selected_student"]:checked');
+            if (!selectedStudent) {
+                alert('学生を選択してください。');
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+
+</html>

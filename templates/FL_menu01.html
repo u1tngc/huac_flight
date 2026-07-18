@@ -52,6 +52,19 @@
                         </div>
                     </div>
                 </div>
+                {% if session['authority'] in [6, 7, 9] %}
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection" value="solo_chk">ソロ前確認</label>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="data-section">
+                    <div class="radio-section">
+                        <label class="radio-group"><input type="radio" name="selection"
+                                value="1st_SoloChk">1stソロ前CHK</label>
+                    </div>
+                </div>
                 {% if session['authority'] in [9] %}
                 <div class="data-section">
                     <div class="radio-section">
@@ -65,13 +78,6 @@
                                 {% endif %}
                             </select>
                         </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% if session['authority'] in [6, 7, 9] %}
-                <div class="data-section">
-                    <div class="radio-section">
-                        <label class="radio-group"><input type="radio" name="selection" value="solo_chk">ソロ前確認</label>
                     </div>
                 </div>
                 {% endif %}

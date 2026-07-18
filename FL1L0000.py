@@ -42,24 +42,26 @@ def FL_menu01():
     if not session.get('user_id'):
         return redirect(url_for('login'))
     user_id = session.get('user_id')  # ユーザーIDを取得
+    authority = session.get('authority')  # 権限を取得
     if request.method == 'POST':
+        session_clear()
         shorikbn = request.form['selection']
         if shorikbn == "db_show":
             dbkbn = request.form["db_kbn1"]
             if dbkbn == "1":
-                #機能：サブG履歴照会
+                #機能：サブG履歴照会(A001)
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName"] = gakuseiName
                 return render_template('FL_db021.html', gakuseiName=gakuseiName)
             if dbkbn == "2":
-                #機能：索切処置履歴照会
+                #機能：索切処置履歴照会(A002)
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName"] = gakuseiName
                 return render_template('FL_db031.html', gakuseiName=gakuseiName)
         elif shorikbn == "db_edit":
             dbkbn = request.form["db_kbn2"]
             if dbkbn == "1":
-                #機能：サブG経歴更新
+                #機能：サブG経歴更新(B001)
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName"] = gakuseiName
                 return render_template('FL_db023.html', gakuseiName=gakuseiName)
@@ -71,17 +73,23 @@ def FL_menu01():
         elif shorikbn == "user_edit":
             dbkbn = request.form["db_kbn3"]
             if dbkbn == "1":
-                #機能：ユーザー情報訂正
+                #機能：ユーザー情報訂正(C001)
                 userData = FL1S0002.get_user01()
                 session[f"{user_id}_userData"] = userData
                 return render_template('FL_db002.html', userData=userData, err1="")
             if dbkbn == "2":
-                #機能：ユーザー情報登録
+                #機能：ユーザー情報登録(C002)
                 return redirect(url_for('FL_db004',err=""))
         elif shorikbn == "solo_chk":
-            #機能：ソロ前確認
+            #機能：ソロ前確認(D001)
             soloList = FL1S0001.get_solo_chk()
-            return render_template('FL_db041.html', soloList=soloList)     
+            return render_template('FL_db041.html', soloList=soloList)   
+        elif shorikbn == "1st_SoloChk":
+            #機能：1stソロ前CHK(D002)
+            if authority not in [0,1]:
+                gakuseiName = FL1S0001.get_gakuseiInfo01()
+                session[f"{user_id}_gakuseiName_D002"] = gakuseiName
+                return render_template('FL_db051.html', gakuseiName=gakuseiName)
         elif shorikbn == "password":
             #機能：パスワード変更
             return redirect(url_for('FL_db010',err=""))
@@ -258,7 +266,6 @@ def FL_db034():
         return redirect(url_for('FL_db034'))
     return render_template('FL_db034.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID, 2), kamokuList=FL1S0001.get_kamokuList(2), err="")
 
-
 #ユーザー管理セグ訂正・照会
 @app.route('/FL_db002', methods=['GET', 'POST'])
 def FL_db002():
@@ -324,7 +331,7 @@ def FL_db004():
 
     return render_template('FL_db004.html', err="")
 
-#学生管理セグ・照会
+#ソロ前確認
 @app.route('/FL_db041', methods=['GET', 'POST'])
 def FL_db041():
     user_id = session.get('user_id')
@@ -332,6 +339,47 @@ def FL_db041():
         return redirect(url_for('FL_login'))
     return render_template('FL_db041.html')
 
+#1stソロ前CHK１
+@app.route('/FL_db051', methods=['GET', 'POST'])
+def FL_db051():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiName_D002" not in session:
+        return redirect(url_for('FL_menu01'))
+    if request.method == 'POST':
+        gakuseiID = request.form['selected_student']
+        session[f'{user_id}_gakuseiID_D002'] = gakuseiID
+        rireki = FL1S0001.get_1stSoloChk(gakuseiID)
+        session[f'{user_id}_rireki_D002'] = rireki
+        return redirect(url_for('FL_db052'))
+
+    return render_template('FL_db051.html', gakuseiName=session.get(f"{user_id}_gakuseiName_D002"))
+
+#1stソロ前CHK２
+@app.route('/FL_db052', methods=['GET', 'POST'])
+def FL_db052():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiID_D002" not in session:
+        return redirect(url_for('FL_menu01'))
+    if request.method == 'POST':
+        return redirect(url_for('FL_menu01'))
+    return render_template('FL_db052.html', rireki=session.get(f'{user_id}_rireki_D002'))
+
+def session_clear():
+    user_id = session.get('user_id')
+    session.pop(f"{user_id}_gakuseiName", None)
+    session.pop(f"{user_id}_gakuseiID", None)
+    session.pop(f"{user_id}_rireki", None)
+    session.pop(f"{user_id}_gakuseiName_D002", None)
+    session.pop(f"{user_id}_gakuseiID_D002", None)
+    session.pop(f"{user_id}_rireki_D002", None)
+    session.pop(f"{user_id}_gakuseiInfo", None)
+    session.pop(f"{user_id}_user", None)
+    session.pop(f"{user_id}_userData", None)
+    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

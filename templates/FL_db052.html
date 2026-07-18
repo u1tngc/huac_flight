@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUAC学科ツール 1stソロ前CHK</title>
+    <link rel="stylesheet" href="../static/FL1C0040.css">
+</head>
+
+<body>
+    <header>
+        <h1>HUAC学科ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>1stソロ前CHK</h2>
+            <div class="student-info">
+                <p><strong>氏名:</strong>{{ rireki[0][0] }}</p>
+            </div>
+            <form method="post" action="/FL_db052">
+                <div class="data-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>実施年月日</th>
+                                <th>実施教官</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>ノーダイブ</th>
+                                {% if rireki[0][1] == 1 %}
+                                <td>{{ rireki[0][2] }}</td>
+                                {% else %}
+                                <td class="err">{{ rireki[0][2] }}</td>
+                                {% endif %}
+                                <td>{{ rireki[0][3] }}</td>
+                            </tr>
+                            <tr>
+                                <th>横風着陸</th>
+                                {% if rireki[1][1] == 1 %}
+                                <td>{{ rireki[1][2] }}</td>
+                                {% else %}
+                                <td class="err">{{ rireki[1][2] }}</td>
+                                {% endif %}
+                                <td>{{ rireki[1][3] }}</td>
+                            </tr>
+                            <tr>
+                                <th>オーバーヘッド</th>
+                                {% if rireki[2][1] == 1 %}
+                                <td>{{ rireki[2][2] }}</td>
+                                {% else %}
+                                <td class="err">{{ rireki[2][2] }}</td>
+                                {% endif %}
+                                <td>{{ rireki[2][3] }}</td>
+                            </tr>
+                            <tr>
+                                <th>失速</th>
+                                {% if rireki[3][1] == 1 %}
+                                <td>{{ rireki[3][2] }}</td>
+                                {% else %}
+                                <td class="err">{{ rireki[3][2] }}</td>
+                                {% endif %}
+                                <td>{{ rireki[3][3] }}</td>
+                            </tr>
+                            <tr>
+                                <th>口述</th>
+                                {% if rireki[4][1] == 1 %}
+                                <td>{{ rireki[4][2] }}</td>
+                                {% else %}
+                                <td class="err">{{ rireki[4][2] }}</td>
+                                {% endif %}
+                                <td>{{ rireki[4][3] }}</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>判定</th>
+                                <th class="err">{{ rireki[5][0]}}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="button-group">
+                        <button type="button" onclick="location.href='/FL_db051'" class="menu-button">戻る</button>
+                    </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

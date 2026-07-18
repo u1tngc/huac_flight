@@ -26,7 +26,6 @@ def get_rireki(id,kbn):
             temp_array[3] = list[ix1][6]
             temp_array[4] = list[ix1][7]
             ret_array.append(temp_array)
-    print(ret_array)
     return ret_array
 
 def get_gakuseiInfo01():
@@ -135,3 +134,24 @@ def get_solo_chk():
         ret_array.append(temp_array)
     return ret_array
                 
+def get_1stSoloChk(id):
+    ret_array = []
+    kamoku_list = ["C1001", "C2001", "C3001", "C4001", "C5001"]
+    gakuseiName = FL0S099D.get_gakuseiName(id)
+    solo_NG_hantei = 0
+    for ix1 in range(len(kamoku_list)):
+        temp_array = [gakuseiName, 0, "未実施", ""]
+        rireki = FL0S002D.get_rirekiSolo(id, kamoku_list[ix1][0:1], kamoku_list[ix1][1:2])
+        if rireki:
+            temp_array[0] = gakuseiName
+            temp_array[1] = 1
+            temp_array[2] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[3] = rireki[6]
+        else:
+            solo_NG_hantei = 1
+        ret_array.append(temp_array)
+    if solo_NG_hantei == 1:
+        ret_array.append(["ＮＧ", 0, "", ""])
+    else:
+        ret_array.append(["ＯＫ", 0, "", ""])
+    return ret_array
