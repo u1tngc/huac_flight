@@ -396,7 +396,7 @@ def FL_db004():
 
     return render_template('FL_db004.html', err="")
 
-#ソロ前確認
+#サブＧ・索切れ状況一括照会
 @app.route('/FL_db041', methods=['GET', 'POST'])
 def FL_db041():
     user_id = session.get('user_id')
