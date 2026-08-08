@@ -20,6 +20,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)  # セッショ
 @app.route('/', methods=['GET', 'POST'])
 def FL_login():
     if request.method == 'POST':
+        flash("現在、メンテナンス中のため、ログインできません。")
+        return redirect(url_for('FL_login'))
         now = datetime.now(ZoneInfo("Asia/Tokyo"))
         if now.weekday() in [1] and now.hour == 0 and now.minute < 30:
             flash("日曜の午前0時から午前0時30分まではメンテナンス時間です。")
