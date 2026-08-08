@@ -24,10 +24,12 @@
                                 <th>氏名</th>
                                 <th>サブＧ</th>
                                 <th>索切れ</th>
+                                <th>スピン</th>
+                                <th>失速</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in soloList %}
+                            {% for student in kinkyuList %}
                             <tr>
                                 <td>{{ student[0] }}</td>
                                 {%if student[1] == 1 %}
@@ -39,6 +41,16 @@
                                 <td style="color: red;">{{ student[4] }}</td>
                                 {% else %}
                                 <td>{{ student[4] }}</td>
+                                {% endif %}
+                                {%if student[5] == 1 %}
+                                <td style="color: red;">{{ student[6] }}</td>
+                                {% else %}
+                                <td>{{ student[6] }}</td>
+                                {% endif %}
+                                {%if student[7] == 1 %}
+                                <td style="color: red;">{{ student[8] }}</td>
+                                {% else %}
+                                <td>{{ student[8] }}</td>
                                 {% endif %}
                             </tr>
                             {% endfor %}

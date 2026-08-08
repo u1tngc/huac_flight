@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUAC学科ツール 1stソロ前CHK</title>
+    <link rel="stylesheet" href="../static/FL1C0040.css">
+</head>
+
+<body>
+    <header>
+        <h1>フライト管理ツール</h1>
+    </header>
+
+    <main>
+        <section class="options">
+            <h2>ソロ・機首移行チェック</h2>
+            <div class="student-info">
+                <p><strong>氏名:</strong>サンプル</p>
+            </div>
+            <form method="post" action="/FL_db052">
+                <div class="data-section">
+                    <p>1stソロ前CHK</p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>実施年月日</th>
+                                <th>実施教官</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>ノーダイブ</th>
+                                <td>2026/04/01</td>
+                                <td>谷口雄一</td>
+                            </tr>
+                            <tr>
+                                <th>横風着陸</th>
+                                <td>2026/04/01</td>
+                                <td>小島淳</td>
+                            </tr>
+                            <tr>
+                                <th>オーバーヘッド</th>
+                                <td class="err">未実施</td>
+                                <td>ー</td>
+                            </tr>
+                            <tr>
+                                <th>失速</th>
+                                <td>2026/03/01</td>
+                                <td>河野貴</td>
+                            </tr>
+                            <tr>
+                                <th>口述</th>
+                                <td>2026/04/03</td>
+                                <td>小島淳</td>
+                            </tr>
+                            <tr>
+                                <th>サブＧ</th>
+                                <td class="err">2025/11/17</td>
+                                <td>妓津佳孝</td>
+                            </tr>
+                            <tr>
+                                <th>1stソロ可否</th>
+                                <th>判定</th>
+                                <th class="err">ＮＧ</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <p>～23移行チェックCHK～</p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>実施年月日</th>
+                                <th>実施教官</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Ｂ章</th>
+                                <td class="err">未実施</td>
+                                <td>ー</td>
+                            </tr>
+                            <tr>
+                                <th>口述</th>
+                                <td class="err">未実施</td>
+                                <td>ー</td>
+                            </tr>
+                            <tr>
+                                <th>学科</th>
+                                <td class="err">未実施</td>
+                                <td>ー</td>
+                            </tr>
+                            <tr>
+                                <th>サブＧ</th>
+                                <td class="err">2025/11/17</td>
+                                <td>妓津佳孝</td>
+                            </tr>
+                            <tr>
+                                <th>索切れ</th>
+                                <td class="err">2025/11/17</td>
+                                <td>妓津佳孝</td>
+                            </tr>
+                            <tr>
+                                <th>23移行可否</th>
+                                <th>判定</th>
+                                <th class="err">ＮＧ</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="button-group">
+                        <button type="button" onclick="location.href='/FL_db051'" class="menu-button">戻る</button>
+                    </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yuichi Taniguchi</p>
+    </footer>
+</body>
+
+</html>

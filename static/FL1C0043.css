@@ -1,6 +1,6 @@
-/* 一覧照会系画面 共通スタイル（表の縦幅は画面サイズに追従）
-   使用画面：FL_db001 / FL_db021 / FL_db022 / FL_db023 / FL_db031 / FL_db032
-             FL_db033 / FL_db041 / FL_db051 / FL_db052 / FL_db063 */
+/* 課目実施履歴更新画面（教官欄あり・5列編集テーブル）専用スタイル
+   使用画面：FL_db065
+   履歴カードを持つため表の縦幅は従来どおり400px固定 */
 
 /* 全体 */
 body {
@@ -69,19 +69,8 @@ main {
 
 /* テーブル（表） */
 .data-section {
-    /* 表示可能な高さを画面の縦幅に追従させる。
-       340px = ヘッダー約66px＋フッター約40px＋main余白40px
-              ＋.options上下padding 80px＋見出し・ボタン群約110px
-       従来の400pxを下回らないよう max() で下限を確保する。 */
-    max-height: max(400px, calc(100vh - 340px));
+    max-height: 400px;
     overflow-y: auto;
-}
-
-/* 画面が低い端末では控えめに。横向きスマホ等で表が潰れるのを防ぐ */
-@media screen and (max-height: 600px) {
-    .data-section {
-        max-height: max(240px, calc(100vh - 260px));
-    }
 }
 
 .data-table {
@@ -367,4 +356,46 @@ footer {
     .field-label {
         font-size: 0.68em;
     }
+}
+
+/* ===== 新規登録テーブルの列幅（5列・教官欄あり） ===== */
+.data-table.db-edit-regist th:nth-child(1),
+.data-table.db-edit-regist td:nth-child(1) {
+    width: 20%;
+    /* 実施年月日 */
+}
+
+.data-table.db-edit-regist th:nth-child(2),
+.data-table.db-edit-regist td:nth-child(2) {
+    width: 20%;
+    /* 課目 */
+}
+
+.data-table.db-edit-regist th:nth-child(3),
+.data-table.db-edit-regist td:nth-child(3) {
+    width: 8%;
+    /* 枝番 */
+}
+
+.data-table.db-edit-regist th:nth-child(4),
+.data-table.db-edit-regist td:nth-child(4) {
+    width: 20%;
+    /* 教官（最大7字） */
+}
+
+.data-table.db-edit-regist th:nth-child(5),
+.data-table.db-edit-regist td:nth-child(5) {
+    width: 32%;
+    /* コメント */
+}
+
+/* 教官セルは余白を詰めて7字分の表示領域を確保 */
+.data-table.db-edit-regist td:nth-child(4) {
+    padding-left: clamp(2px, 0.5vw, 4px);
+    padding-right: clamp(2px, 0.5vw, 4px);
+}
+
+.data-table.db-edit-regist td:nth-child(4) .table-input {
+    padding-left: 2px;
+    padding-right: 0;
 }

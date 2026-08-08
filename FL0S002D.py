@@ -1,5 +1,5 @@
 #PGM-ID:FL0S002D
-#PGM-NAME:FL緊急課目履歴セグI/O(オンライン)
+#PGM-NAME:FL課目履歴セグI/O(オンライン)
 #最終更新日:2026/06/26
 
 import psycopg2
@@ -18,17 +18,16 @@ DB_CONFIG = {
     "target_session_attrs": "read-write"
 }
 
-
 def get_rireki(id,bunya,kbn):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            if bunya == "D":
-                sql = 'SELECT * FROM "緊急課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s'
+            if bunya == "F":
+                sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s'
                 data = (id,bunya,kbn)
             else:
-                sql = 'SELECT * FROM "緊急課目履歴セグ" WHERE 学籍番号 = %s AND 分野 != %s'
-                data = (id,"D")
+                sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 != %s'
+                data = (id,"F")
             cur.execute(sql,data)
             result = cur.fetchall()
         conn.close()
@@ -44,7 +43,7 @@ def insert_rireki(insert_data):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            sql = 'INSERT INTO "緊急課目履歴セグ" (学籍番号, 実施年月日, 分野, 区分, 番号, 枝番, 教官, コメント) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+            sql = 'INSERT INTO "課目履歴セグ" (学籍番号, 実施年月日, 分野, 区分, 番号, 枝番, 教官, コメント) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
             data = (insert_data[0], insert_data[1], insert_data[2], insert_data[3], insert_data[4], insert_data[5], insert_data[6], insert_data[7])
             cur.execute(sql, data)
             conn.commit()
@@ -66,7 +65,7 @@ def update_rireki(comment, key_data):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            sql = 'UPDATE "緊急課目履歴セグ" SET コメント = %s WHERE 学籍番号 = %s AND 実施年月日 = %s AND 分野 = %s AND 区分 = %s AND 番号 = %s AND 枝番 = %s'
+            sql = 'UPDATE "課目履歴セグ" SET コメント = %s WHERE 学籍番号 = %s AND 実施年月日 = %s AND 分野 = %s AND 区分 = %s AND 番号 = %s AND 枝番 = %s'
             data = (comment, key_data[0], key_data[1], key_data[2], key_data[3], key_data[4], key_data[5])
             cur.execute(sql, data)
             conn.commit()
@@ -83,13 +82,22 @@ def get_rirekiSolo(id, bunya, kbn):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
-            sql = (
-                'SELECT * FROM "緊急課目履歴セグ" '
-                'WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s '
-                'ORDER BY 実施年月日 DESC, 番号 ASC, 枝番 ASC '
-                'LIMIT 1'
-            )
-            data = (id, bunya, kbn)
+            if bunya == "":
+                sql = (
+                    'SELECT * FROM "課目履歴セグ" '
+                    'WHERE 学籍番号 = %s AND ((分野 = %s AND 区分 = %s) OR (分野 = %s AND 区分 = %s)) '
+                    'ORDER BY 実施年月日 DESC, 番号 ASC, 枝番 ASC '
+                    'LIMIT 1'
+                )
+                data = (id, 'E', '2', 'C', '4')
+            else:
+                sql = (
+                    'SELECT * FROM "課目履歴セグ" '
+                    'WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s '
+                    'ORDER BY 実施年月日 DESC, 番号 ASC, 枝番 ASC '
+                    'LIMIT 1'
+                )
+                data = (id, bunya, kbn)
             cur.execute(sql, data)
             result = cur.fetchone()
         conn.close()

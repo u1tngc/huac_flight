@@ -1,3 +1,6 @@
+/* ユーザー管理系画面 共通スタイル（表の縦幅は画面サイズに追従）
+   使用画面：FL_db002 / FL_db003 / FL_db004 / FL_db010 */
+
 /* 全体 */
 body {
     font-family: 'Arial', sans-serif;
@@ -131,8 +134,19 @@ footer {
 }
 
 .data-section {
-    max-height: 400px;
+    /* 表示可能な高さを画面の縦幅に追従させる。
+       340px = ヘッダー約66px＋フッター約40px＋main余白40px
+              ＋.options上下padding 80px＋見出し・ボタン群約110px
+       従来の400pxを下回らないよう max() で下限を確保する。 */
+    max-height: max(400px, calc(100vh - 340px));
     overflow-y: auto;
+}
+
+/* 画面が低い端末では控えめに。横向きスマホ等で表が潰れるのを防ぐ */
+@media screen and (max-height: 600px) {
+    .data-section {
+        max-height: max(240px, calc(100vh - 260px));
+    }
 }
 
 .data-table {

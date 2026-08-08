@@ -12,9 +12,9 @@ import FL0S099D
 
 def get_rireki(id,kbn):
     if kbn == 1:
-        list = FL0S002D.get_rireki(id,"D","1")
+        list = FL0S002D.get_rireki(id,"F","1")
     elif kbn == 2:
-        list = FL0S002D.get_rireki(id,"D","2")
+        list = FL0S002D.get_rireki(id,"F","2")
     ret_array = []
     if list:
         name = FL0S099D.get_gakuseiName(id)
@@ -38,7 +38,7 @@ def get_gakuseiName(id):
 
 #更新画面用：課目選択肢（区分別）を取得
 def get_kamokuList(kbn):
-    temp_array = FL0S01XD.get_kamokuList("D", str(kbn))
+    temp_array = FL0S01XD.get_kamokuList("F", str(kbn))
     ret_array = []
     for ix1 in range(len(temp_array)):
         kamoku_no = temp_array[ix1][0]+temp_array[ix1][1]+temp_array[ix1][2]
@@ -97,6 +97,19 @@ def regist_rireki(id, ymd, bangou, edaban, comment, user_id):
         return "登録に失敗しました。"
     return ""
 
+#履歴登録1（学生用）
+def regist_rireki1(id, ymd, bangou, edaban, kyokan, comment):
+    err = check_rireki(ymd, bangou, edaban, comment)
+    if err:
+        return err
+    insert_data = [id, ymd, bangou[0:1], bangou[1:2], bangou[2:6], int(edaban), kyokan, comment]
+    ret = FL0S002D.insert_rireki(insert_data)
+    if ret == 3:
+        return "同一の履歴が既に登録されています。"
+    if ret != 0:
+        return "登録に失敗しました。"
+    return ""
+
 #履歴訂正（コメント）
 def correct_rireki(id, ymd, bunya, kbn, bangou, edaban, comment):
     if len(comment) > 255:
@@ -107,34 +120,54 @@ def correct_rireki(id, ymd, bunya, kbn, bangou, edaban, comment):
         return "訂正に失敗しました。"
     return ""
 
-def get_solo_chk():
+def get_kinkyu_rireki():
     JST = timezone(timedelta(hours=9))
-    kijunYmd =  (datetime.now(JST) - relativedelta(months=3)).strftime("%Y%m%d")
+    kijunYmd =  (datetime.now(JST) - relativedelta(months=6)).strftime("%Y%m%d")
     gakusei_list = FL0S099D.get_gakuseiInfo01()
     ret_array = []
     for ix1 in range(len(gakusei_list)):
-        temp_array = ["",0,"",0,""]
-        subG = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "D", "1")
-        saku = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "D", "2")
+        temp_array = ["",0,"",0,"",0,"",0,""]
+        subG = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "F", "1")
+        saku = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "F", "2")
+        spin = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "F", "4")
+        sissoku = FL0S002D.get_rirekiSolo(gakusei_list[ix1][0], "", "")
         temp_array[0] = gakusei_list[ix1][1]
         if not subG:
             temp_array[1] = 1
-            temp_array[2] = "実施無し"
+            temp_array[2] = "実施無"
         elif subG[1] < kijunYmd:
             temp_array[1] = 1
-            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%y/%m/%d")
         else:
             temp_array[1] = 0
-            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = datetime.strptime(subG[1], "%Y%m%d").strftime("%y/%m/%d")
         if not saku:
             temp_array[3] = 1
-            temp_array[4] = "実施無し"
+            temp_array[4] = "実施無"
         elif saku[1] < kijunYmd:
             temp_array[3] = 1
-            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%y/%m/%d")
         else:
             temp_array[3] = 0
-            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[4] = datetime.strptime(saku[1], "%Y%m%d").strftime("%y/%m/%d")
+        if not spin:
+            temp_array[5] = 1
+            temp_array[6] = "実施無"
+        elif spin[1] < kijunYmd:
+            temp_array[5] = 1
+            temp_array[6] = datetime.strptime(spin[1], "%Y%m%d").strftime("%y/%m/%d")
+        else:
+            temp_array[5] = 0
+            temp_array[6] = datetime.strptime(spin[1], "%Y%m%d").strftime("%y/%m/%d")
+        if not sissoku:
+            temp_array[7] = 1
+            temp_array[8] = "実施無"
+        elif sissoku[1] < kijunYmd:
+            temp_array[7] = 1
+            temp_array[8] = datetime.strptime(sissoku[1], "%Y%m%d").strftime("%y/%m/%d")
+        else:
+            temp_array[7] = 0
+            temp_array[8] = datetime.strptime(sissoku[1], "%Y%m%d").strftime("%y/%m/%d")
         ret_array.append(temp_array)
     return ret_array
                 
@@ -159,3 +192,7 @@ def get_1stSoloChk(id):
     else:
         ret_array.append(["ＯＫ", 0, "", ""])
     return ret_array
+
+def get_kyokanList():
+    ret_array = FL0S001D.get_kyokanList()
+    return [row[0] for row in ret_array]

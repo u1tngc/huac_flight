@@ -129,3 +129,19 @@ def insert_user(id, name, status_cd, password):
     finally:
         if conn:
             conn.close() 
+
+def get_kyokanList():
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)  
+        with conn.cursor() as cur:
+            sql = 'SELECT 氏名 FROM "ユーザー管理セグ" WHERE 権限 != 0 AND 権限 != 1'
+            cur.execute(sql)
+            result = cur.fetchall()  
+        conn.close()
+        return [list(row) for row in result]
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return []
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return [] 

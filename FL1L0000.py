@@ -14,20 +14,21 @@ import FL1S0002
 app = Flask(__name__)
 app.secret_key = "your_fixed_secret_key_here"  # 固定のキーを使用
 app.config['SESSION_PERMANENT'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)  # セッション有効期限30分
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  # セッション有効期限30分
 
 # ログインページ
 @app.route('/', methods=['GET', 'POST'])
 def FL_login():
     if request.method == 'POST':
-        flash("現在、メンテナンス中のため、ログインできません。")
-        return redirect(url_for('FL_login'))
         now = datetime.now(ZoneInfo("Asia/Tokyo"))
         if now.weekday() in [1] and now.hour == 0 and now.minute < 30:
             flash("日曜の午前0時から午前0時30分まではメンテナンス時間です。")
             return redirect(url_for('FL_login'))
         in_password = request.form['password']
         in_user = request.form['user']
+        if in_user != '16A3184':
+            flash("現在、アップデート作業中のため、ログインできません。")
+            return redirect(url_for('FL_login'))
         login_ret, info = FL1S0002.login_check(in_user, in_password)
         if login_ret == 0:
             session.permanent = True
@@ -64,9 +65,13 @@ def FL_menu01():
             dbkbn = request.form["db_kbn2"]
             if dbkbn == "0":
                 #機能：課目実施履歴登録(B000)
-                gakuseiName = FL1S0001.get_gakuseiInfo01()
-                session[f"{user_id}_gakuseiName_B000"] = gakuseiName
-                return render_template('FL_db063.html', gakuseiName=gakuseiName)
+                if session.get(f"authority") in [0,1]:
+                    session[f"{user_id}_gakuseiID_B000"] = user_id
+                    return redirect(url_for('FL_db065'))
+                else:
+                    gakuseiName = FL1S0001.get_gakuseiInfo01()
+                    session[f"{user_id}_gakuseiName_B000"] = gakuseiName
+                    return render_template('FL_db063.html', gakuseiName=gakuseiName)
             elif dbkbn == "1":
                 #機能：サブG経歴更新(B001)
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
@@ -87,10 +92,10 @@ def FL_menu01():
             if dbkbn == "2":
                 #機能：ユーザー情報登録(C002)
                 return redirect(url_for('FL_db004',err=""))
-        elif shorikbn == "solo_chk":
-            #機能：ソロ前確認(D001)
-            soloList = FL1S0001.get_solo_chk()
-            return render_template('FL_db041.html', soloList=soloList)   
+        elif shorikbn == "kinkyu_rireki":
+            #機能：緊急処置課目状況一括照会(D001)
+            kinkyuList = FL1S0001.get_kinkyu_rireki()
+            return render_template('FL_db041.html', kinkyuList=kinkyuList)
         elif shorikbn == "1st_SoloChk":
             #機能：1stソロ前CHK(D002)
             if authority not in [0,1]:
@@ -234,6 +239,41 @@ def FL_db064():
         return redirect(url_for('FL_db064'))
     return render_template('FL_db064.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID,"",0), kamokuList=FL1S0001.get_kamokuList(0), err="")
 
+#課目実施履歴更新（登録・訂正）学生用
+@app.route('/FL_db065', methods=['GET', 'POST'])
+def FL_db065():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('FL_login'))
+    if f"{user_id}_gakuseiID_B000" not in session:
+        return redirect(url_for('FL_menu01'))
+    gakuseiID = session.get(f'{user_id}_gakuseiID_B000')
+    if request.method == 'POST':
+        op = request.form['op']
+        if op == "insert":
+            ymd = request.form['ymd'].replace('-', '')
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            kyokan = request.form['kyokan']
+            comment = request.form['comment']
+            err = FL1S0001.regist_rireki1(gakuseiID, ymd, bangou, edaban, kyokan, comment)
+            if err:
+                return render_template('FL_db065.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID,"",0), kamokuList=FL1S0001.get_kamokuList(3), kyokanList=FL1S0001.get_kyokanList(), err=err)
+            flash("登録が完了しました。")
+        elif op == "update":
+            ymd = request.form['ymd']
+            bangou = request.form['bangou']
+            edaban = request.form['edaban']
+            comment = request.form['comment']
+            bunya = bangou[0:1]
+            kbn = bangou[1:2]
+            bangou = bangou[2:6]
+            err = FL1S0001.correct_rireki(gakuseiID, ymd, bunya, kbn, bangou, edaban, comment)
+            if err:
+                return render_template('FL_db065.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID,"",0), kamokuList=FL1S0001.get_kamokuList(3), kyokanList=FL1S0001.get_kyokanList(), err=err)
+            flash("訂正が完了しました。")
+        return redirect(url_for('FL_db065'))
+    return render_template('FL_db065.html', gakuseiName=FL1S0001.get_gakuseiName(gakuseiID), rireki=FL1S0001.get_rirekiEdit(gakuseiID,"",0), kamokuList=FL1S0001.get_kamokuList(3), kyokanList=FL1S0001.get_kyokanList(), err="")
 
 #サブG経歴更新（学生選択）
 @app.route('/FL_db023', methods=['GET', 'POST'])
@@ -452,8 +492,6 @@ def session_clear(user_id):
     session.pop(f"{user_id}_gakuseiName_D002", None)
     session.pop(f"{user_id}_gakuseiID_D002", None)
     session.pop(f"{user_id}_rireki_D002", None)
-
-    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
