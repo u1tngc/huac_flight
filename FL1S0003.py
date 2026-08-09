@@ -52,14 +52,17 @@ def _fmt_ymd(value):
             pass
     return value
 
-def _set_cell(ws, col, row, value, ng_flg):
-    """セルへ値を設定。ng_flgが1なら赤字＋灰色塗り、2なら青字（他はテンプレの設定を引き継ぐ）"""
+def _set_cell(ws, col, row, value, ng_flg, fill_flg=1):
+    """セルへ値を設定
+       ng_flg   1:赤字 2:青字 それ以外:テンプレのまま
+       fill_flg 1:ＮＧ時に灰色で塗る 0:塗らない（判定列で使用）"""
     cell = ws[f"{col}{row}"]
     cell.value = value
     if ng_flg == 1:
         cell.font = Font(name=cell.font.name, size=cell.font.size,
                          bold=cell.font.bold, color=COLOR_NG)
-        cell.fill = FILL_NG
+        if fill_flg == 1:
+            cell.fill = FILL_NG
     elif ng_flg == 2:
         cell.font = Font(name=cell.font.name, size=cell.font.size,
                          bold=cell.font.bold, color=COLOR_OK)
@@ -103,7 +106,7 @@ def make_SoloChk_excel():
             for ix1 in range(len(COL_SOLO)):
                 _set_cell(ws, COL_SOLO[ix1], row, _fmt_ymd(r1[ix1][1]), r1[ix1][0])
             if r1[5] == 1:
-                _set_cell(ws, COL_SOLO_HANTEI, row, "ＮＧ", 1)
+                _set_cell(ws, COL_SOLO_HANTEI, row, "ＮＧ", 1, 0)
             else:
                 _set_cell(ws, COL_SOLO_HANTEI, row, "ＯＫ", 2)
 
@@ -115,7 +118,7 @@ def make_SoloChk_excel():
             else:
                 _set_cell(ws, COL_23_GAKKA, row, "ＯＫ", 0)
             if r2[4] == 1:
-                _set_cell(ws, COL_23_HANTEI, row, "ＮＧ", 1)
+                _set_cell(ws, COL_23_HANTEI, row, "ＮＧ", 1, 0)
             else:
                 _set_cell(ws, COL_23_HANTEI, row, "ＯＫ", 2)
 
@@ -126,7 +129,7 @@ def make_SoloChk_excel():
             else:
                 _set_cell(ws, COL_DIS_SHIKAKU, row, "取得済", 0)
             if r3[3] == 1:
-                _set_cell(ws, COL_DIS_HANTEI, row, "ＮＧ", 1)
+                _set_cell(ws, COL_DIS_HANTEI, row, "ＮＧ", 1, 0)
             else:
                 _set_cell(ws, COL_DIS_HANTEI, row, "ＯＫ", 2)
 
