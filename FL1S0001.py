@@ -176,6 +176,8 @@ def get_SoloChk(id):
     ret_array1 = check_Solo(id, ret_array0)
     if ret_array1[5] == 1:
         solo_kahi = 1
+    else:
+        solo_kahi = 0
     ret_array2 = check_23iko(id, ret_array0, solo_kahi)
     ret_array3 = check_dis(id, ret_array0, solo_kahi)
     name = FL0S099D.get_gakuseiName(id)
