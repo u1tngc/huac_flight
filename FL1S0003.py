@@ -19,6 +19,10 @@ import FL1S0001
 TEMPLATE_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "template", "合宿前資料_テンプレ.xlsx")
 
+#判定欄の文字色（ＮＧ:赤／ＯＫ:青）
+COLOR_NG = "FFFF0000"
+COLOR_OK = "FF0000FF"
+
 #EXCELのMIMEタイプ
 EXCEL_MIMETYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -48,12 +52,15 @@ def _fmt_ymd(value):
     return value
 
 def _set_cell(ws, col, row, value, ng_flg):
-    """セルへ値を設定。ng_flgが1なら赤字（書式はテンプレの設定を引き継ぐ）"""
+    """セルへ値を設定。ng_flgが1なら赤字、2なら青字（書式はテンプレの設定を引き継ぐ）"""
     cell = ws[f"{col}{row}"]
     cell.value = value
     if ng_flg == 1:
         cell.font = Font(name=cell.font.name, size=cell.font.size,
-                         bold=cell.font.bold, color="FFFF0000")
+                         bold=cell.font.bold, color=COLOR_NG)
+    elif ng_flg == 2:
+        cell.font = Font(name=cell.font.name, size=cell.font.size,
+                         bold=cell.font.bold, color=COLOR_OK)
 
 def make_SoloChk_excel():
     """単座チェック表を作成し、(バイト列, ファイル名) を返す"""
@@ -82,8 +89,13 @@ def make_SoloChk_excel():
             _set_cell(ws, COL_NAME, row, name, 0)
 
             #①緊急処置課目
+            #  6ヵ月以内 :[1]に実施日  6ヵ月超過:[1]は未実施のまま[2]に実施日
+            #  データ無し :[1]は未実施 [2]は空
             for ix1 in range(len(COL_KINKYU)):
-                _set_cell(ws, COL_KINKYU[ix1], row, _fmt_ymd(r0[ix1][1]), r0[ix1][0])
+                value = r0[ix1][1]
+                if value == "未実施" and r0[ix1][2]:
+                    value = r0[ix1][2]
+                _set_cell(ws, COL_KINKYU[ix1], row, _fmt_ymd(value), r0[ix1][0])
 
             #②単座要件
             for ix1 in range(len(COL_SOLO)):
@@ -91,7 +103,7 @@ def make_SoloChk_excel():
             if r1[5] == 1:
                 _set_cell(ws, COL_SOLO_HANTEI, row, "ＮＧ", 1)
             else:
-                _set_cell(ws, COL_SOLO_HANTEI, row, "ＯＫ", 1)
+                _set_cell(ws, COL_SOLO_HANTEI, row, "ＯＫ", 2)
 
             #③２３要件
             for ix1 in range(len(COL_23)):
@@ -103,18 +115,21 @@ def make_SoloChk_excel():
             if r2[4] == 1:
                 _set_cell(ws, COL_23_HANTEI, row, "ＮＧ", 1)
             else:
-                _set_cell(ws, COL_23_HANTEI, row, "ＯＫ", 1)
+                _set_cell(ws, COL_23_HANTEI, row, "ＯＫ", 2)
 
             #④ディスカス要件
             _set_cell(ws, COL_DIS_ARCUS, row, _fmt_ymd(r3[0][1]), r3[0][0])
             if r3[2][0] == 1:
-                _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
+                if r1[5] == 1:
+                    _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
+                else:
+                    _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
             else:
                 _set_cell(ws, COL_DIS_SHIKAKU, row, "取得済", 0)
             if r3[3] == 1:
                 _set_cell(ws, COL_DIS_HANTEI, row, "ＮＧ", 1)
             else:
-                _set_cell(ws, COL_DIS_HANTEI, row, "ＯＫ", 1)
+                _set_cell(ws, COL_DIS_HANTEI, row, "ＯＫ", 2)
 
             row = row + 1
 
