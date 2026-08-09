@@ -22,10 +22,7 @@ DB_CONFIG = {
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-#---------------------------------------------------------------
-# 単座チェック表EXCEL出力用キャッシュ
-#   全学生分を1回のSELECTで読み込み、以降はメモリから引く。
-#---------------------------------------------------------------
+#以降、excel出力用
 _cacheGakusei = None
 _cacheTest = None
 

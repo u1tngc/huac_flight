@@ -109,7 +109,10 @@ def make_SoloChk_excel():
             for ix1 in range(len(COL_23)):
                 _set_cell(ws, COL_23[ix1], row, _fmt_ymd(r2[ix1][1]), r2[ix1][0])
             if r2[3][0] == 1:
-                _set_cell(ws, COL_23_GAKKA, row, "ＮＧ", 1)
+                if r1[5] == 1:
+                    _set_cell(ws, COL_23_GAKKA, row, "-", 1)
+                else:
+                    _set_cell(ws, COL_23_GAKKA, row, "ＮＧ", 1)
             else:
                 _set_cell(ws, COL_23_GAKKA, row, "ＯＫ", 0)
             if r2[4] == 1:
@@ -121,7 +124,7 @@ def make_SoloChk_excel():
             _set_cell(ws, COL_DIS_ARCUS, row, _fmt_ymd(r3[0][1]), r3[0][0])
             if r3[2][0] == 1:
                 if r1[5] == 1:
-                    _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
+                    _set_cell(ws, COL_DIS_SHIKAKU, row, "-", 1)
                 else:
                     _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
             else:

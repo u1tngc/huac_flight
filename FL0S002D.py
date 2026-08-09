@@ -78,11 +78,7 @@ def update_rireki(comment, key_data):
         print(f'エラー内容：{e}')
         return 2
 
-#---------------------------------------------------------------
-# 単座チェック表EXCEL出力用キャッシュ
-#   全学生分を1回のSELECTで読み込み、以降はメモリから引く。
-#   load_cacheSolo() 〜 clear_cacheSolo() の間だけ有効。
-#---------------------------------------------------------------
+#以降、excel出力用
 _cacheSolo = None
 
 def load_cacheSolo():
