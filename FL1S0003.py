@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 from urllib.parse import quote
 from flask import Response
 from openpyxl import load_workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, PatternFill
 
 import FL0S002D
 import FL0S099D
@@ -19,9 +19,10 @@ import FL1S0001
 TEMPLATE_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "template", "合宿前資料_テンプレ.xlsx")
 
-#判定欄の文字色（ＮＧ:赤／ＯＫ:青）
+#文字色（ＮＧ:赤／ＯＫ:青）とＮＧ時のセル塗りつぶし色（灰）
 COLOR_NG = "FFFF0000"
 COLOR_OK = "FF0000FF"
+FILL_NG = PatternFill("solid", fgColor="FFD9D9D9")
 
 #EXCELのMIMEタイプ
 EXCEL_MIMETYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -52,12 +53,13 @@ def _fmt_ymd(value):
     return value
 
 def _set_cell(ws, col, row, value, ng_flg):
-    """セルへ値を設定。ng_flgが1なら赤字、2なら青字（書式はテンプレの設定を引き継ぐ）"""
+    """セルへ値を設定。ng_flgが1なら赤字＋灰色塗り、2なら青字（他はテンプレの設定を引き継ぐ）"""
     cell = ws[f"{col}{row}"]
     cell.value = value
     if ng_flg == 1:
         cell.font = Font(name=cell.font.name, size=cell.font.size,
                          bold=cell.font.bold, color=COLOR_NG)
+        cell.fill = FILL_NG
     elif ng_flg == 2:
         cell.font = Font(name=cell.font.name, size=cell.font.size,
                          bold=cell.font.bold, color=COLOR_OK)
@@ -109,10 +111,7 @@ def make_SoloChk_excel():
             for ix1 in range(len(COL_23)):
                 _set_cell(ws, COL_23[ix1], row, _fmt_ymd(r2[ix1][1]), r2[ix1][0])
             if r2[3][0] == 1:
-                if r1[5] == 1:
-                    _set_cell(ws, COL_23_GAKKA, row, "-", 1)
-                else:
-                    _set_cell(ws, COL_23_GAKKA, row, "ＮＧ", 1)
+                _set_cell(ws, COL_23_GAKKA, row, "ＮＧ", 1)
             else:
                 _set_cell(ws, COL_23_GAKKA, row, "ＯＫ", 0)
             if r2[4] == 1:
@@ -123,10 +122,7 @@ def make_SoloChk_excel():
             #④ディスカス要件
             _set_cell(ws, COL_DIS_ARCUS, row, _fmt_ymd(r3[0][1]), r3[0][0])
             if r3[2][0] == 1:
-                if r1[5] == 1:
-                    _set_cell(ws, COL_DIS_SHIKAKU, row, "-", 1)
-                else:
-                    _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
+                _set_cell(ws, COL_DIS_SHIKAKU, row, "未取得", 1)
             else:
                 _set_cell(ws, COL_DIS_SHIKAKU, row, "取得済", 0)
             if r3[3] == 1:
