@@ -261,6 +261,12 @@ def check_Solo(id,kinkyu_array):
     if kinkyu_array[0][0] == 1:
         solo_NG_hantei = 1
         jiyu_array.append("サブＧが未実施もしくは６ヵ月以内に実施無し")
+    if kinkyu_array[2][0] == 1:
+        solo_NG_hantei = 1
+        jiyu_array.append("失速が未実施もしくは６ヵ月以内に実施無し")
+    if kinkyu_array[3][0] == 1:
+        solo_NG_hantei = 1
+        jiyu_array.append("スピン（初動含む）が未実施もしくは６ヵ月以内に実施無し")
     if solo_NG_hantei == 1:
         ret_array.append(1)
         ret_array.append(jiyu_array)
