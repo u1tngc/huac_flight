@@ -1,5 +1,5 @@
 #PGM-ID:FL1S0003
-#PGM-NAME:FL単座CHK表EXCEL出力サブ
+#PGM-NAME:FL単座チェック表EXCEL出力サブ
 #最終更新日:2026/08/09
 
 import os
@@ -11,6 +11,8 @@ from flask import Response
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 
+import FL0S002D
+import FL0S099D
 import FL1S0001
 
 #テンプレ格納先（FL1S0003.pyと同階層の template フォルダ）
@@ -57,6 +59,11 @@ def make_SoloChk_excel():
     """単座チェック表を作成し、(バイト列, ファイル名) を返す"""
     JST = timezone(timedelta(hours=9))
     now = datetime.now(JST)
+
+    #全学生分のデータを先読みしてキャッシュ（DB接続を4回に抑える）
+    FL0S002D.load_cacheSolo()
+    FL0S099D.load_cacheGakusei()
+    FL0S099D.load_cacheTest()
 
     #テンプレを一時ファイルへコピー（テンプレ本体は編集しない）
     tmp_dir = tempfile.mkdtemp()
@@ -116,6 +123,9 @@ def make_SoloChk_excel():
             data = f.read()
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+        FL0S002D.clear_cacheSolo()
+        FL0S099D.clear_cacheGakusei()
+        FL0S099D.clear_cacheTest()
 
     filename = f"単座チェック表_{now.strftime('%Y%m%d%H%M')}.xlsx"
     return data, filename

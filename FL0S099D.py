@@ -22,7 +22,65 @@ DB_CONFIG = {
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
+#---------------------------------------------------------------
+# 単座チェック表EXCEL出力用キャッシュ
+#   全学生分を1回のSELECTで読み込み、以降はメモリから引く。
+#---------------------------------------------------------------
+_cacheGakusei = None
+_cacheTest = None
+
+def load_cacheGakusei():
+    global _cacheGakusei
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            sql = 'SELECT 学籍番号, 氏名, 資格 FROM "学生管理セグ"'
+            cur.execute(sql)
+            result = cur.fetchall()
+        conn.close()
+        _cacheGakusei = {row[0]: [row[1], row[2]] for row in result}
+        return 0
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        _cacheGakusei = None
+        return 1
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        _cacheGakusei = None
+        return 1
+
+def load_cacheTest():
+    global _cacheTest
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            sql = 'SELECT * FROM "各種chk管理セグ" WHERE データ種類 = %s'
+            cur.execute(sql, (1,))
+            result = cur.fetchall()
+        conn.close()
+        _cacheTest = {row[0]: list(row) for row in result}
+        return 0
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        _cacheTest = None
+        return 1
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        _cacheTest = None
+        return 1
+
+def clear_cacheGakusei():
+    global _cacheGakusei
+    _cacheGakusei = None
+
+def clear_cacheTest():
+    global _cacheTest
+    _cacheTest = None
+
 def get_gakuseiName(id):
+    if _cacheGakusei is not None:
+        info = _cacheGakusei.get(id)
+        return info[0] if info else ""
     try:
         conn = psycopg2.connect(**DB_CONFIG)  
         with conn.cursor() as cur:
@@ -90,6 +148,9 @@ def update_userPassword(id, password):
         return 2
 
 def get_shikaku(id):
+    if _cacheGakusei is not None:
+        info = _cacheGakusei.get(id)
+        return info[1] if info else 0
     try:
         conn = psycopg2.connect(**DB_CONFIG)  
         with conn.cursor() as cur:
@@ -107,6 +168,8 @@ def get_shikaku(id):
         return 0
 
 def get_test(id):
+    if _cacheTest is not None:
+        return list(_cacheTest.get(id, []))
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:

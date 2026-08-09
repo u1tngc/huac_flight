@@ -78,7 +78,62 @@ def update_rireki(comment, key_data):
         print(f'エラー内容：{e}')
         return 2
 
+#---------------------------------------------------------------
+# 単座チェック表EXCEL出力用キャッシュ
+#   全学生分を1回のSELECTで読み込み、以降はメモリから引く。
+#   load_cacheSolo() 〜 clear_cacheSolo() の間だけ有効。
+#---------------------------------------------------------------
+_cacheSolo = None
+
+def load_cacheSolo():
+    global _cacheSolo
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            sql = (
+                'SELECT 学籍番号, 実施年月日, 分野, 区分, 番号, 枝番, 教官, コメント '
+                'FROM "課目履歴セグ" '
+                'ORDER BY 実施年月日 DESC, 番号 ASC, 枝番 ASC'
+            )
+            cur.execute(sql)
+            result = cur.fetchall()
+        conn.close()
+        cache = {}
+        for row in result:
+            key = (row[0], row[2], row[3])
+            if key not in cache:
+                cache[key] = list(row)
+        _cacheSolo = cache
+        return 0
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        _cacheSolo = None
+        return 1
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        _cacheSolo = None
+        return 1
+
+def clear_cacheSolo():
+    global _cacheSolo
+    _cacheSolo = None
+
+def _get_rirekiSoloCache(id, bunya, kbn):
+    if bunya == "":
+        cand = [_cacheSolo.get((id, "E", "2")), _cacheSolo.get((id, "C", "4"))]
+        cand = [row for row in cand if row]
+    else:
+        row = _cacheSolo.get((id, bunya, kbn))
+        cand = [row] if row else []
+    if not cand:
+        return []
+    cand.sort(key=lambda row: (row[4], row[5]))
+    cand.sort(key=lambda row: row[1], reverse=True)
+    return list(cand[0])
+
 def get_rirekiSolo(id, bunya, kbn):
+    if _cacheSolo is not None:
+        return _get_rirekiSoloCache(id, bunya, kbn)
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
