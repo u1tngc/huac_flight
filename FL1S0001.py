@@ -276,6 +276,9 @@ def check_23iko(id, kinkyu_array, solo_kahi):
     kamoku_list = ["C6001", "D1001", "D2001"]
     kamoku_name = ["Ａ章", "Ｂ章", "２３移行口述"]
     solo_NG_hantei = 0
+    if solo_kahi == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"ソロ要件を満たしていない")
     for ix1 in range(len(kamoku_list)):
         temp_array = [1, "未実施", "-"]
         if kamoku_list[ix1] == "1":
@@ -299,9 +302,6 @@ def check_23iko(id, kinkyu_array, solo_kahi):
         ret_array.append([1, "NG", "-"])
         jiyu_array.append("中間CHKの合格数が２件未満")
     kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
-    if solo_kahi == 1:
-            solo_NG_hantei = 1
-            jiyu_array.append(f"ソロ要件を満たしていない")
     for ix1 in range(len(kinkyu_array)):
         if kinkyu_array[ix1][0] == 1:
             solo_NG_hantei = 1
@@ -327,6 +327,9 @@ def check_dis(id, kinkyu_array, solo_kahi):
     kamoku_list = ["G1001", "G2001"]
     kamoku_name = ["アーカス搭乗", "口述"]
     solo_NG_hantei = 0
+    if solo_kahi == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"ソロ要件を満たしていない")
     for ix1 in range(len(kamoku_list)):
         temp_array = [1, "未実施", "-"]
         if kamoku_list[ix1] == "1":
@@ -349,9 +352,6 @@ def check_dis(id, kinkyu_array, solo_kahi):
         jiyu_array.append("自家用資格がありません。")
     else:
         ret_array.append([0, "自家用資格あり", "-"])
-    if solo_kahi == 1:
-            solo_NG_hantei = 1
-            jiyu_array.append(f"ソロ要件を満たしていない")
     kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
     for ix1 in range(len(kinkyu_array)):
         if kinkyu_array[ix1][0] == 1:
