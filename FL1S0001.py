@@ -172,25 +172,12 @@ def get_kinkyu_rireki():
     return ret_array
                 
 def get_SoloChk(id):
-    gakuseiName = FL0S099D.get_gakuseiName(id)
     ret_array0 = check_kinkyu(id)
     ret_array1 = check_Solo(id, ret_array0)
     if ret_array1[5] == 1:
-        ret_array2 = []
-        for ix1 in range(4):
-            ret_array2.append([1, "判定対象外", "判定対象外"])
-        ret_array2.append(1)
-        jiyu_array = ["ソロ要件を満たしていません。"]
-        ret_array2.append(jiyu_array)
-        ret_array3 = []
-        for ix1 in range(3):
-            ret_array3.append([1, "判定対象外", "判定対象外"])
-        ret_array3.append(1)
-        jiyu_array = ["ソロ要件を満たしていません。"]
-        ret_array3.append(jiyu_array)
-    else:
-        ret_array2 = check_23iko(id, ret_array0)
-        ret_array3 = check_dis(id, ret_array0)
+        solo_kahi = 1
+    ret_array2 = check_23iko(id, ret_array0, solo_kahi)
+    ret_array3 = check_dis(id, ret_array0, solo_kahi)
     name = FL0S099D.get_gakuseiName(id)
     return name, ret_array0, ret_array1, ret_array2, ret_array3
 
@@ -275,7 +262,7 @@ def check_Solo(id,kinkyu_array):
         ret_array.append("")
     return ret_array
 
-def check_23iko(id, kinkyu_array):
+def check_23iko(id, kinkyu_array, solo_kahi):
     """
     0:Ａ章
     1:Ｂ章
@@ -312,6 +299,9 @@ def check_23iko(id, kinkyu_array):
         ret_array.append([1, "NG", "-"])
         jiyu_array.append("中間CHKの合格数が２件未満")
     kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
+    if solo_kahi == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"ソロ要件を満たしていない")
     for ix1 in range(len(kinkyu_array)):
         if kinkyu_array[ix1][0] == 1:
             solo_NG_hantei = 1
@@ -324,7 +314,7 @@ def check_23iko(id, kinkyu_array):
         ret_array.append("")
     return ret_array
 
-def check_dis(id, kinkyu_array):
+def check_dis(id, kinkyu_array, solo_kahi):
     """
     0:アーカス搭乗
     1:口述
@@ -359,6 +349,9 @@ def check_dis(id, kinkyu_array):
         jiyu_array.append("自家用資格がありません。")
     else:
         ret_array.append([0, "自家用資格あり", "-"])
+    if solo_kahi == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"ソロ要件を満たしていない")
     kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
     for ix1 in range(len(kinkyu_array)):
         if kinkyu_array[ix1][0] == 1:
