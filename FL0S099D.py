@@ -1,6 +1,6 @@
 #PGM-ID:FL0S099D
 #PGM-NAME:FL学科関連ＤＢI/O(オンライン)
-#最終更新日:2026/06/25
+#最終更新日:2026/08/09
 
 import psycopg2
 import os
@@ -18,6 +18,7 @@ DB_CONFIG = {
     "sslrootcert": "",
     "target_session_attrs": "read-write"
 }
+
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -87,3 +88,37 @@ def update_userPassword(id, password):
     except Exception as e:
         print(f'エラー内容：{e}')
         return 2
+
+def get_shikaku(id):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)  
+        with conn.cursor() as cur:
+            sql = 'SELECT 資格 FROM "学生管理セグ" WHERE 学籍番号 = %s'
+            data = (id,)
+            cur.execute(sql, data)
+            result = cur.fetchone()  
+        conn.close()
+        return result[0] if result else 0
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return 0
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return 0
+
+def get_test(id):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            sql = 'SELECT * FROM "各種chk管理セグ" WHERE 学籍番号 = %s AND データ種類 = %s'
+            data = (id, 1)
+            cur.execute(sql, data)
+            result = cur.fetchone()
+        conn.close()
+        return list(result) if result else []
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return []
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return []

@@ -36,6 +36,7 @@ def get_user02(user_id):
         3: "指導員",
         4: "指定養成教官",
         5: "監督",
+        8: "管理者(学生)",
         9: "管理者"
         }
     user_data[2] = status_dict[user_data[2]]

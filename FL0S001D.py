@@ -1,6 +1,6 @@
 #PGM-ID:FL0S001D
 #PGM-NAME:FLユーザー管理セグI/O(オンライン)
-#最終更新日:2026/06/25
+#最終更新日:2026/08/09
 
 import psycopg2
 import bcrypt
@@ -18,7 +18,6 @@ DB_CONFIG = {
     "sslrootcert": "",
     "target_session_attrs": "read-write"
 }
-
 
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -134,7 +133,7 @@ def get_kyokanList():
     try:
         conn = psycopg2.connect(**DB_CONFIG)  
         with conn.cursor() as cur:
-            sql = 'SELECT 氏名 FROM "ユーザー管理セグ" WHERE 権限 != 0 AND 権限 != 1'
+            sql = 'SELECT 氏名 FROM "ユーザー管理セグ" WHERE 権限 != 0 AND 権限 != 1 AND 権限 != 8'
             cur.execute(sql)
             result = cur.fetchall()  
         conn.close()

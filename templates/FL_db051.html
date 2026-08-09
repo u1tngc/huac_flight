@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUACフライト管理ツール 1stソロ前CHK（選択）</title>
+    <title>HUACフライト管理ツール 単座チェック（選択）</title>
     <link rel="stylesheet" href="../static/FL1C0040.css">
 </head>
 
@@ -15,7 +15,7 @@
 
     <main>
         <section class="options">
-            <h2>1stソロ前CHK（選択）</h2>
+            <h2>単座チェック（選択）</h2>
             <a>照会する学生を選択してください。</a>
             <form method="post" action="/FL_db051">
                 <div class="data-section">
@@ -47,7 +47,8 @@
                 </div>
                 <div class="button-group">
                     <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">Menu</button>
-                    <button type="submit" class="execute-button">次へ</button>
+                    <button type="submit" name="op" value="next" class="execute-button">次へ</button>
+                    <button type="submit" name="op" value="excel" class="menu-button">Excel出力</button>
                 </div>
             </form>
         </section>

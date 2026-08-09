@@ -1,6 +1,6 @@
 #PGM-ID:FL0S002D
 #PGM-NAME:FL課目履歴セグI/O(オンライン)
-#最終更新日:2026/06/26
+#最終更新日:2026/08/09
 
 import psycopg2
 import os

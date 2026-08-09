@@ -1,6 +1,6 @@
 #PGM-ID:FL1S0001
 #PGM-NAME:FLフライト管理履歴サブ
-#最終更新日:2026/07/18
+#最終更新日:2026/08/09
 
 from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
@@ -171,28 +171,218 @@ def get_kinkyu_rireki():
         ret_array.append(temp_array)
     return ret_array
                 
-def get_1stSoloChk(id):
-    ret_array = []
-    kamoku_list = ["C1001", "C2001", "C3001", "C4001", "C5001"]
+def get_SoloChk(id):
     gakuseiName = FL0S099D.get_gakuseiName(id)
+    ret_array0 = check_kinkyu(id)
+    ret_array1 = check_Solo(id, ret_array0)
+    if ret_array1[5] == 1:
+        ret_array2 = []
+        for ix1 in range(4):
+            ret_array2.append([1, "判定対象外", "判定対象外"])
+        ret_array2.append(1)
+        jiyu_array = ["ソロ要件を満たしていません。"]
+        ret_array2.append(jiyu_array)
+        ret_array3 = []
+        for ix1 in range(3):
+            ret_array3.append([1, "判定対象外", "判定対象外"])
+        ret_array3.append(1)
+        jiyu_array = ["ソロ要件を満たしていません。"]
+        ret_array3.append(jiyu_array)
+    else:
+        ret_array2 = check_23iko(id, ret_array0)
+        ret_array3 = check_dis(id, ret_array0)
+    name = FL0S099D.get_gakuseiName(id)
+    return name, ret_array0, ret_array1, ret_array2, ret_array3
+
+def check_kinkyu(id):
+    """
+    0:サブＧ
+    1:索切れ
+    2:失速
+    3:スピン
+    """
+    JST = timezone(timedelta(hours=9))
+    kijunYmd =  (datetime.now(JST) - relativedelta(months=6)).strftime("%Y%m%d")
+    ret_array = []
+    jiyu_array = []
+    kamoku_list = ["サブＧ", "索切れ", "失速", "スピン"]
+    for ix1 in range(len(kamoku_list)):
+        temp_array = [1,"未実施",""]
+        if ix1 == 0:
+            rireki = FL0S002D.get_rirekiSolo(id, "F", "1")
+        elif ix1 == 1:
+            rireki = FL0S002D.get_rirekiSolo(id, "F", "2")
+        elif ix1 == 2:
+            rireki = FL0S002D.get_rirekiSolo(id, "", "")
+        elif ix1 == 3:
+            rireki = FL0S002D.get_rirekiSolo(id, "F", "4")
+        if not rireki:
+            pass
+        elif rireki[1] < kijunYmd:
+            temp_array[2] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%y/%m/%d")
+        else:
+            temp_array[0] = 0
+            temp_array[1] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%y/%m/%d")
+            temp_array[2] = rireki[6]
+        ret_array.append(temp_array)
+
+    return ret_array
+
+def check_Solo(id,kinkyu_array):
+    """
+    0:ノーダイブ
+    1:横風着陸
+    2:オーバーヘッド
+    3:失速
+    4:口述
+    5:ソロ判定
+    6:NG事由
+    """
+    ret_array = []
+    jiyu_array = []
+    kamoku_list = ["C1001", "C2001", "C3001", "1", "C5001"]
+    kamoku_name = ["ノーダイブ", "横風着陸", "オーバーヘッド", "失速", "口述"]
     solo_NG_hantei = 0
     for ix1 in range(len(kamoku_list)):
-        temp_array = [gakuseiName, 0, "未実施", ""]
-        rireki = FL0S002D.get_rirekiSolo(id, kamoku_list[ix1][0:1], kamoku_list[ix1][1:2])
+        temp_array = [1, "未実施", ""]
+        if kamoku_list[ix1] == "1":
+            rireki = FL0S002D.get_rirekiSolo(id, "", "")
+        else:
+            rireki = FL0S002D.get_rirekiSolo(id, kamoku_list[ix1][0:1], kamoku_list[ix1][1:2])
         if rireki:
-            temp_array[0] = gakuseiName
-            temp_array[1] = 1
-            temp_array[2] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%Y/%m/%d")
-            temp_array[3] = rireki[6]
+            temp_array[0] = 0
+            temp_array[1] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = rireki[6]
         else:
             solo_NG_hantei = 1
+            jiyu = f"【{kamoku_name[ix1]}】が未実施"
+            jiyu_array.append(jiyu)
         ret_array.append(temp_array)
+    if kinkyu_array[0][0] == 1:
+        solo_NG_hantei = 1
+        jiyu_array.append("サブＧが未実施もしくは６ヵ月以内に実施無し")
     if solo_NG_hantei == 1:
-        ret_array.append(["ＮＧ", 0, "", ""])
+        ret_array.append(1)
+        ret_array.append(jiyu_array)
     else:
-        ret_array.append(["ＯＫ", 0, "", ""])
+        ret_array.append(0)
+        ret_array.append("")
+    return ret_array
+
+def check_23iko(id, kinkyu_array):
+    """
+    0:Ａ章
+    1:Ｂ章
+    2:２３移行口述
+    3:学科
+    4:判定
+    5:NG事由
+    """
+    ret_array = []
+    jiyu_array = []
+    kamoku_list = ["C6001", "D1001", "D2001"]
+    kamoku_name = ["Ａ章", "Ｂ章", "２３移行口述"]
+    solo_NG_hantei = 0
+    for ix1 in range(len(kamoku_list)):
+        temp_array = [1, "未実施", "-"]
+        if kamoku_list[ix1] == "1":
+            rireki = FL0S002D.get_rirekiSolo(id, "", "")
+        else:
+            rireki = FL0S002D.get_rirekiSolo(id, kamoku_list[ix1][0:1], kamoku_list[ix1][1:2])
+        if rireki:
+            temp_array[0] = 0
+            temp_array[1] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = rireki[6]
+        else:
+            solo_NG_hantei = 1
+            jiyu = f"【{kamoku_name[ix1]}】が未実施"
+            jiyu_array.append(jiyu)
+        ret_array.append(temp_array)
+    test_num = check_test(id)
+    if test_num > 2:
+        ret_array.append([0, "問題なし", "-"])
+    else:
+        solo_NG_hantei = 1
+        ret_array.append([1, "NG", "-"])
+        jiyu_array.append("中間CHKの合格数が２件未満")
+    kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
+    for ix1 in range(len(kinkyu_array)):
+        if kinkyu_array[ix1][0] == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"【{kinkyu[ix1]}】が未実施もしくは６ヵ月以内に実施無し")
+    if solo_NG_hantei == 1:
+        ret_array.append(1)
+        ret_array.append(jiyu_array)
+    else:
+        ret_array.append(0)
+        ret_array.append("")
+    return ret_array
+
+def check_dis(id, kinkyu_array):
+    """
+    0:アーカス搭乗
+    1:口述
+    2:自家用
+    3:判定
+    4:NG事由
+    """
+    ret_array = []
+    jiyu_array = []
+    kamoku_list = ["G1001", "G2001"]
+    kamoku_name = ["アーカス搭乗", "口述"]
+    solo_NG_hantei = 0
+    for ix1 in range(len(kamoku_list)):
+        temp_array = [1, "未実施", "-"]
+        if kamoku_list[ix1] == "1":
+            rireki = FL0S002D.get_rirekiSolo(id, "", "")
+        else:
+            rireki = FL0S002D.get_rirekiSolo(id, kamoku_list[ix1][0:1], kamoku_list[ix1][1:2])
+        if rireki:
+            temp_array[0] = 0
+            temp_array[1] = datetime.strptime(rireki[1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = rireki[6]
+        else:
+            solo_NG_hantei = 1
+            jiyu = f"【{kamoku_name[ix1]}】が未実施"
+            jiyu_array.append(jiyu)
+        ret_array.append(temp_array)
+    shikaku = FL0S099D.get_shikaku(id)
+    if shikaku == 0:
+        solo_NG_hantei = 1
+        ret_array.append([1, "練許生", "-"])
+        jiyu_array.append("自家用資格がありません。")
+    else:
+        ret_array.append([0, "自家用資格あり", "-"])
+    kinkyu = ["サブＧ","索切れ","失速","スピン（初動含む）"]
+    for ix1 in range(len(kinkyu_array)):
+        if kinkyu_array[ix1][0] == 1:
+            solo_NG_hantei = 1
+            jiyu_array.append(f"【{kinkyu[ix1]}】が未実施もしくは６ヵ月以内に実施無し")
+    if solo_NG_hantei == 1:
+        ret_array.append(1)
+        ret_array.append(jiyu_array)
+    else:
+        ret_array.append(0)
+        ret_array.append("")
     return ret_array
 
 def get_kyokanList():
     ret_array = FL0S001D.get_kyokanList()
     return [row[0] for row in ret_array]
+
+def check_test(id):
+    shikaku = FL0S099D.get_shikaku(id)
+    if shikaku == 0:
+        temp_array = FL0S099D.get_test(id)
+        num = 0
+        if temp_array[2]:
+            num = num + 1
+        if temp_array[3]:  
+            num = num + 1
+        if temp_array[4]:
+            num = num + 1
+        if temp_array[5]:
+            num = num + 1
+        return num
+    else:
+        return 4

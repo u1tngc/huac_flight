@@ -1,15 +1,17 @@
 #PGM-ID:FL1L0000
 #PGM-NAME:FLフライト管理オンラインメイン
-#最終更新日:2026/07/18
+#最終更新日:2026/08/09
 
 from datetime import timedelta
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 import os
 from zoneinfo import ZoneInfo
+from urllib.parse import quote
 
 import FL1S0001
 import FL1S0002
+import FL1S0003
 
 app = Flask(__name__)
 app.secret_key = "your_fixed_secret_key_here"  # 固定のキーを使用
@@ -26,7 +28,7 @@ def FL_login():
             return redirect(url_for('FL_login'))
         in_password = request.form['password']
         in_user = request.form['user']
-        if in_user != '16A3184':
+        if in_user not in ['16A3184', '99A0104'] :
             flash("現在、アップデート作業中のため、ログインできません。")
             return redirect(url_for('FL_login'))
         login_ret, info = FL1S0002.login_check(in_user, in_password)
@@ -96,16 +98,19 @@ def FL_menu01():
             #機能：緊急処置課目状況一括照会(D001)
             kinkyuList = FL1S0001.get_kinkyu_rireki()
             return render_template('FL_db041.html', kinkyuList=kinkyuList)
-        elif shorikbn == "1st_SoloChk":
-            #機能：1stソロ前CHK(D002)
+        elif shorikbn == "SoloChk":
+            #機能：単座前CHK(D002)
             if authority not in [0,1]:
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName_D002"] = gakuseiName
                 return render_template('FL_db051.html', gakuseiName=gakuseiName)
             else:
-                rireki = FL1S0001.get_1stSoloChk(user_id)
-                session[f'{user_id}_gakuseiID_D002'] = user_id
-                session[f'{user_id}_rireki_D002'] = rireki
+                name ,rireki0, rireki1, rireki2,rireki3 = FL1S0001.get_SoloChk(user_id)
+                session[f'{user_id}_rireki0_D002'] = rireki0
+                session[f'{user_id}_rireki1_D002'] = rireki1
+                session[f'{user_id}_rireki2_D002'] = rireki2
+                session[f'{user_id}_rireki3_D002'] = rireki3
+                session[f'{user_id}_name_D002'] = name
                 return redirect(url_for('FL_db052'))
         elif shorikbn == "password":
             #機能：パスワード変更
@@ -410,7 +415,7 @@ def FL_db003():
         update_user = [id, name, int(status_cd)]
         err = FL1S0002.update_user(update_user)
         err = f"[{name}]の訂正が完了しました。"
-        userData = session.get(f"{user_id}_userData_C001")
+        userData = FL1S0002.get_user01()
         return render_template('FL_db002.html', userData=userData, err1=err)
     return render_template('FL_db003.html', userInfo=session.get(f'{user_id}_user_C001'), err ="")
 
@@ -438,7 +443,7 @@ def FL_db004():
 
     return render_template('FL_db004.html', err="")
 
-#サブＧ・索切れ状況一括照会
+#緊急課目状況一括照会
 @app.route('/FL_db041', methods=['GET', 'POST'])
 def FL_db041():
     user_id = session.get('user_id')
@@ -456,11 +461,21 @@ def FL_db051():
         return redirect(url_for('FL_menu01'))
     if request.method == 'POST':
         gakuseiID = request.form['selected_student']
-        session[f'{user_id}_gakuseiID_D002'] = gakuseiID
-        rireki = FL1S0001.get_1stSoloChk(gakuseiID)
-        session[f'{user_id}_rireki_D002'] = rireki
-        return redirect(url_for('FL_db052'))
-
+        op = request.form.get('op', 'next')
+        if op == "excel":
+            return FL1S0003.make_SoloChk_excelResponse()
+        else:
+            session[f'{user_id}_gakuseiID_D002'] = gakuseiID
+            name ,rireki0, rireki1, rireki2,rireki3 = FL1S0001.get_SoloChk(gakuseiID)
+            session[f'{user_id}_rireki0_D002'] = rireki0
+            session[f'{user_id}_rireki1_D002'] = rireki1
+            session[f'{user_id}_rireki2_D002'] = rireki2
+            session[f'{user_id}_rireki3_D002'] = rireki3
+            session[f'{user_id}_name_D002'] = name
+            print(rireki1[6])
+            print(rireki2[5])
+            print(rireki3[4])
+            return redirect(url_for('FL_db052'))
     return render_template('FL_db051.html', gakuseiName=session.get(f"{user_id}_gakuseiName_D002"))
 
 #1stソロ前CHK２
@@ -473,7 +488,7 @@ def FL_db052():
         return redirect(url_for('FL_menu01'))
     if request.method == 'POST':
         return redirect(url_for('FL_menu01'))
-    return render_template('FL_db052.html', rireki=session.get(f'{user_id}_rireki_D002'))
+    return render_template('FL_db052.html', gakuseiName=session.get(f"{user_id}_name_D002"), rireki0=session.get(f'{user_id}_rireki0_D002'), rireki1=session.get(f'{user_id}_rireki1_D002'), rireki2=session.get(f'{user_id}_rireki2_D002'), rireki3=session.get(f'{user_id}_rireki3_D002'))
 
 def session_clear(user_id):
     session.pop(f"{user_id}_gakuseiName_A001", None)
@@ -491,7 +506,10 @@ def session_clear(user_id):
     session.pop(f"{user_id}_gakuseiInfo_C001", None)
     session.pop(f"{user_id}_gakuseiName_D002", None)
     session.pop(f"{user_id}_gakuseiID_D002", None)
-    session.pop(f"{user_id}_rireki_D002", None)
+    session.pop(f"{user_id}_rireki0_D002", None)
+    session.pop(f"{user_id}_rireki1_D002", None)
+    session.pop(f"{user_id}_rireki2_D002", None)
+    session.pop(f"{user_id}_rireki3_D002", None)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

@@ -1,6 +1,6 @@
 #PGM-ID:FL0S01XD
 #PGM-NAME:FL課目ＣＤ管理セグI/O(オンライン)
-#最終更新日:2026/06/26
+#最終更新日:2026/08/09
 
 import psycopg2
 import os
@@ -17,7 +17,6 @@ DB_CONFIG = {
     "sslrootcert": "",
     "target_session_attrs": "read-write"
 }
-
 
 def get_kamoku(bunya,kbn,bangou):
     try:
