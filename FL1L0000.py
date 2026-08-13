@@ -28,9 +28,9 @@ def FL_login():
             return redirect(url_for('FL_login'))
         in_password = request.form['password']
         in_user = request.form['user']
-        if in_user not in ['16A3184', '99A0104'] :
-            flash("現在、アップデート作業中のため、ログインできません。")
-            return redirect(url_for('FL_login'))
+        # if in_user not in ['16A3184', '99A0104'] :
+        #     flash("現在、アップデート作業中のため、ログインできません。")
+        #     return redirect(url_for('FL_login'))
         login_ret, info = FL1S0002.login_check(in_user, in_password)
         if login_ret == 0:
             session.permanent = True
