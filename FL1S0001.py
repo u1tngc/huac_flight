@@ -11,20 +11,22 @@ import FL0S01XD
 import FL0S099D
 
 def get_rireki(id,kbn):
-    if kbn == 1:
-        list = FL0S002D.get_rireki(id,"F","1")
+    if isinstance(kbn, (list, tuple)):
+        rireki_list = FL0S002D.get_rireki(id,"F",[str(k) for k in kbn])
+    elif kbn == 1:
+        rireki_list = FL0S002D.get_rireki(id,"F","1")
     elif kbn == 2:
-        list = FL0S002D.get_rireki(id,"F","2")
+        rireki_list = FL0S002D.get_rireki(id,"F","2")
     ret_array = []
-    if list:
+    if rireki_list:
         name = FL0S099D.get_gakuseiName(id)
-        for ix1 in range(len(list)):
+        for ix1 in range(len(rireki_list)):
             temp_array = [""]*5
             temp_array[0] = name
-            temp_array[1] = datetime.strptime(list[ix1][1], "%Y%m%d").strftime("%Y/%m/%d")
-            temp_array[2] = FL0S01XD.get_kamoku(list[ix1][2],list[ix1][3],list[ix1][4])
-            temp_array[3] = list[ix1][6]
-            temp_array[4] = list[ix1][7]
+            temp_array[1] = datetime.strptime(rireki_list[ix1][1], "%Y%m%d").strftime("%Y/%m/%d")
+            temp_array[2] = FL0S01XD.get_kamoku(rireki_list[ix1][2],rireki_list[ix1][3],rireki_list[ix1][4])
+            temp_array[3] = rireki_list[ix1][6]
+            temp_array[4] = rireki_list[ix1][7]
             ret_array.append(temp_array)
     return ret_array
 
@@ -38,7 +40,10 @@ def get_gakuseiName(id):
 
 #更新画面用：課目選択肢（区分別）を取得
 def get_kamokuList(kbn):
-    temp_array = FL0S01XD.get_kamokuList("F", str(kbn))
+    if isinstance(kbn, (list, tuple)):
+        temp_array = FL0S01XD.get_kamokuList("F", [str(k) for k in kbn])
+    else:
+        temp_array = FL0S01XD.get_kamokuList("F", str(kbn))
     ret_array = []
     for ix1 in range(len(temp_array)):
         kamoku_no = temp_array[ix1][0]+temp_array[ix1][1]+temp_array[ix1][2]
@@ -47,17 +52,20 @@ def get_kamokuList(kbn):
 
 #更新画面用：キー項目込みの履歴一覧を取得
 def get_rirekiEdit(id, bunya, kbn):
-    list = FL0S002D.get_rireki(id, bunya, str(kbn))
+    if isinstance(kbn, (list, tuple)):
+        rireki_list = FL0S002D.get_rireki(id, bunya, [str(k) for k in kbn])
+    else:
+        rireki_list = FL0S002D.get_rireki(id, bunya, str(kbn))
     ret_array = []
-    if list:
-        for ix1 in range(len(list)):
+    if rireki_list:
+        for ix1 in range(len(rireki_list)):
             temp_array = [""]*6
-            temp_array[0] = list[ix1][1]
-            temp_array[1] = list[ix1][2]+list[ix1][3]+list[ix1][4]
-            temp_array[2] = list[ix1][5]
-            temp_array[3] = FL0S01XD.get_kamoku(list[ix1][2],list[ix1][3],list[ix1][4])
-            temp_array[4] = list[ix1][6]
-            temp_array[5] = list[ix1][7]
+            temp_array[0] = rireki_list[ix1][1]
+            temp_array[1] = rireki_list[ix1][2]+rireki_list[ix1][3]+rireki_list[ix1][4]
+            temp_array[2] = rireki_list[ix1][5]
+            temp_array[3] = FL0S01XD.get_kamoku(rireki_list[ix1][2],rireki_list[ix1][3],rireki_list[ix1][4])
+            temp_array[4] = rireki_list[ix1][6]
+            temp_array[5] = rireki_list[ix1][7]
             ret_array.append(temp_array)
     return ret_array
 
@@ -108,6 +116,22 @@ def regist_rireki1(id, ymd, bangou, edaban, kyokan, comment):
         return "同一の履歴が既に登録されています。"
     if ret != 0:
         return "登録に失敗しました。"
+    return ""
+
+#履歴削除
+def delete_rireki(id, ymd, bunya, kbn, bangou, edaban):
+    if not id or not ymd or not bunya or not kbn or not bangou or not edaban:
+        return "削除対象の履歴を特定できませんでした。"
+    try:
+        eda = int(edaban)
+    except ValueError:
+        return "削除対象の履歴を特定できませんでした。"
+    key_data = [id, ymd, bunya, str(kbn), bangou, eda]
+    ret = FL0S002D.delete_rireki(key_data)
+    if ret == 3:
+        return "削除対象の履歴が見つかりませんでした。既に削除されている可能性があります。"
+    if ret != 0:
+        return "削除に失敗しました。"
     return ""
 
 #履歴訂正（コメント）

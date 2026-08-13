@@ -51,7 +51,9 @@ main {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 700px;
+    /* カード幅を画面サイズに追従させる（狭い画面は従来どおり最大700px、
+       広い画面では画面幅の90%まで、上限1400pxで伸びる） */
+    max-width: clamp(700px, 90vw, 1400px);
     text-align: center;
 }
 
@@ -254,9 +256,9 @@ footer {
     }
 }
 
-/* ===== 履歴カードレイアウト ===== */
-/* 1レコード＝1カード。日付・課目名・教官をヘッダーにまとめ、
-   可変長のコメントはカード幅いっぱいで折り返す。 */
+/* ===== 履歴カードレイアウト（帳票調） ===== */
+/* 1レコード＝1カード。見出し帯に実施年月日／課目名／課目CDを置き、
+   以降はラベル列＋罫線で項目を縦に整列させる。 */
 .history-list {
     max-height: 400px;
     overflow-y: auto;
@@ -265,77 +267,130 @@ footer {
     padding-right: 4px;
 }
 
+/* 共通の form 指定（display:flex／align-items:center）はカードを内容幅に縮めるため、
+   履歴カードのフォームだけブロック表示に戻してカードを全幅で使う */
+.history-list form {
+    display: block;
+}
+
 .history-card {
     background-color: #fff;
-    border: 1px solid #e2e5ea;
-    border-left: 4px solid #1e3a8a;
-    /* PANTONE280 */
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #c8cdd4;
+    border-radius: 2px;
+    margin-bottom: 14px;
 }
 
 .history-card:last-child {
     margin-bottom: 0;
 }
 
-/* カード上部：実施年月日（8桁）／課目名（最大全角15）／教官（最大全角5） */
+/* カード見出し帯：実施年月日／課目名／課目CD＋枝番 */
 .history-card-header {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    align-items: baseline;
+    gap: 6px 14px;
+    padding: 9px 14px;
+    background-color: #eef1f5;
+    border-bottom: 1px solid #c8cdd4;
 }
 
 .history-date {
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    letter-spacing: 0.05em;
-    background-color: #1e3a8a;
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 4px;
+    letter-spacing: 0.04em;
+    color: #1f2933;
     white-space: nowrap;
     font-size: 0.95em;
 }
 
 .history-subject {
     font-weight: bold;
-    font-size: 1.05em;
     color: #1e3a8a;
-    flex: 1 1 140px;
 }
 
-.history-instructor {
-    color: #555;
-    white-space: nowrap;
+.history-code {
     margin-left: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78em;
+    color: #6b7280;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
 }
 
-/* 項目ラベル（教官・コメント） */
-.field-label {
-    display: inline-block;
-    font-size: 0.72em;
+/* 明細行：ラベル列（固定幅）＋値 */
+.history-row {
+    display: grid;
+    grid-template-columns: clamp(78px, 12vw, 128px) 1fr;
+    border-bottom: 1px solid #e5e8ec;
+}
+
+.history-label {
+    background-color: #f7f8fa;
+    padding: 9px 12px;
+    font-size: 0.82em;
     font-weight: bold;
-    color: #fff;
-    background-color: #9aa5b1;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-right: 6px;
-    vertical-align: middle;
-    letter-spacing: 0.03em;
+    color: #4b5563;
+    border-right: 1px solid #e5e8ec;
+    letter-spacing: 0.06em;
 }
 
-/* コメント：可変長。改行も保持し、幅いっぱいで折り返す */
-.history-comment {
-    margin: 10px 0 0;
-    line-height: 1.7;
+.history-value {
+    padding: 7px 12px;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
     color: #333;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+/* カード内の入力欄（.data-table 配下ではないため幅指定が別途必要） */
+.history-value .table-input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 5px 7px;
+    font-size: 0.95em;
+    border: 1px solid #bdc3c7;
+    border-radius: 3px;
+}
+
+/* カード下部：訂正・削除ボタン */
+.history-foot {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 9px 14px;
+    background-color: #fafbfc;
+}
+
+.history-button {
+    background-color: #fff;
+    border: 1px solid #1e3a8a;
+    color: #1e3a8a;
+    padding: 6px 22px;
+    border-radius: 2px;
+    font-size: 0.9em;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.history-button:hover {
+    background-color: #1e3a8a;
+    color: #fff;
+}
+
+/* 削除は破壊的操作のため赤系で区別する */
+.history-button.delete {
+    border-color: #b91c1c;
+    color: #b91c1c;
+}
+
+.history-button.delete:hover {
+    background-color: #b91c1c;
+    color: #fff;
 }
 
 .history-empty {
@@ -345,16 +400,13 @@ footer {
 }
 
 @media screen and (max-width: 600px) {
-    .history-card {
-        padding: 12px 14px;
-    }
-
-    .history-instructor {
+    .history-code {
         margin-left: 0;
     }
 
-    .field-label {
-        font-size: 0.68em;
+    .history-button {
+        padding: 6px 16px;
+        font-size: 0.85em;
     }
 }
 

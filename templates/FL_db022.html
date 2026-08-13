@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUACフライト管理ツール サブＧ履歴照会</title>
+    <title>HUACフライト管理ツール 緊急課目履歴照会</title>
     <link rel="stylesheet" href="../static/FL1C0040.css">
 </head>
 
@@ -14,10 +14,10 @@
     </header>
 
     <main>
-        <section class="options">
-            <h2>サブＧ履歴照会</h2>
+        <section class="options options-wide">
+            <h2>緊急課目履歴照会</h2>
             <div class="student-info">
-                <p><strong>氏名:</strong> {{ rireki[0][0] }}</p>
+                <p><strong>氏名:</strong> {{ gakuseiName }}</p>
             </div>
             <form method="post" action="/FL_db022">
                 <div class="history-list">
@@ -26,9 +26,15 @@
                         <div class="history-card-header">
                             <span class="history-date">{{ list[1] }}</span>
                             <span class="history-subject">{{ list[2] }}</span>
-                            <span class="history-instructor"><span class="field-label">教官</span>{{ list[3] }}</span>
                         </div>
-                        <p class="history-comment"><span class="field-label">コメント</span>{{ list[4] }}</p>
+                        <div class="history-row">
+                            <div class="history-label">教　官</div>
+                            <div class="history-value">{{ list[3] }}</div>
+                        </div>
+                        <div class="history-row">
+                            <div class="history-label">コメント</div>
+                            <div class="history-value">{{ list[4] }}</div>
+                        </div>
                     </div>
                     {% else %}
                     <p class="history-empty">該当する履歴データがありません。</p>

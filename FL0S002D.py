@@ -1,6 +1,6 @@
 #PGM-ID:FL0S002D
 #PGM-NAME:FL課目履歴セグI/O(オンライン)
-#最終更新日:2026/08/09
+#最終更新日:2026/08/14
 
 import psycopg2
 import os
@@ -18,15 +18,29 @@ DB_CONFIG = {
     "target_session_attrs": "read-write"
 }
 
+#表示順：実施年月日（降順）＞分野（昇順）＞区分（昇順）＞番号（昇順）＞枝番（降順）
+ORDER_RIREKI = ' ORDER BY 実施年月日 DESC, 分野 ASC, 区分 ASC, 番号 ASC, 枝番 DESC'
+ORDER_RIREKI_R = ' ORDER BY r.実施年月日 DESC, r.分野 ASC, r.区分 ASC, r.番号 ASC, r.枝番 DESC'
+
 def get_rireki(id,bunya,kbn):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         with conn.cursor() as cur:
             if bunya == "F":
-                sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s'
-                data = (id,bunya,kbn)
+                if isinstance(kbn, (list, tuple)):
+                    sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = ANY(%s)' + ORDER_RIREKI
+                    data = (id,bunya,list(kbn))
+                else:
+                    sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 = %s AND 区分 = %s' + ORDER_RIREKI
+                    data = (id,bunya,kbn)
+            elif kbn == "3":
+                #学生（権限0,1）用：登録可能な課目（更新区分＝０）の履歴に限定する
+                sql = ('SELECT r.* FROM "課目履歴セグ" AS r '
+                       'JOIN "課目cdセグ" AS c ON r.分野 = c.分野 AND r.区分 = c.区分 AND r.番号 = c.番号 '
+                       'WHERE r.学籍番号 = %s AND c.更新区分 = 0') + ORDER_RIREKI_R
+                data = (id,)
             else:
-                sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 != %s'
+                sql = 'SELECT * FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 分野 != %s' + ORDER_RIREKI
                 data = (id,"F")
             cur.execute(sql,data)
             result = cur.fetchall()
@@ -68,6 +82,28 @@ def update_rireki(comment, key_data):
             sql = 'UPDATE "課目履歴セグ" SET コメント = %s WHERE 学籍番号 = %s AND 実施年月日 = %s AND 分野 = %s AND 区分 = %s AND 番号 = %s AND 枝番 = %s'
             data = (comment, key_data[0], key_data[1], key_data[2], key_data[3], key_data[4], key_data[5])
             cur.execute(sql, data)
+            conn.commit()
+        conn.close()
+        return 0
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return 1
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return 2
+
+def delete_rireki(key_data):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        with conn.cursor() as cur:
+            sql = 'DELETE FROM "課目履歴セグ" WHERE 学籍番号 = %s AND 実施年月日 = %s AND 分野 = %s AND 区分 = %s AND 番号 = %s AND 枝番 = %s'
+            data = (key_data[0], key_data[1], key_data[2], key_data[3], key_data[4], key_data[5])
+            cur.execute(sql, data)
+            #該当データが無い場合は削除件数0として通知する
+            if cur.rowcount == 0:
+                conn.rollback()
+                conn.close()
+                return 3
             conn.commit()
         conn.close()
         return 0

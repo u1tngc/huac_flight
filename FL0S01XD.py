@@ -1,6 +1,6 @@
 #PGM-ID:FL0S01XD
 #PGM-NAME:FL課目ＣＤ管理セグI/O(オンライン)
-#最終更新日:2026/08/09
+#最終更新日:2026/08/14
 
 import psycopg2
 import os
@@ -43,8 +43,12 @@ def get_kamokuList(bunya,kbn):
                 sql = 'SELECT 分野, 区分, 番号, 課目名 FROM "課目cdセグ" WHERE 分野 != %s ORDER BY 分野 ASC, 区分 ASC, 番号 ASC'
                 data = (bunya,) 
             elif kbn == "3":
-                sql = 'SELECT 分野, 区分, 番号, 課目名 FROM "課目cdセグ" WHERE 分野 != %s AND 更新区分 = 0 ORDER BY 分野 ASC, 区分 ASC, 番号 ASC'
-                data = (bunya,)          
+                #学生（権限0,1）が登録可能な課目は更新区分＝０のみで判定する
+                sql = 'SELECT 分野, 区分, 番号, 課目名 FROM "課目cdセグ" WHERE 更新区分 = 0 ORDER BY 分野 ASC, 区分 ASC, 番号 ASC'
+                data = None
+            elif isinstance(kbn, (list, tuple)):
+                sql = 'SELECT 分野, 区分, 番号, 課目名 FROM "課目cdセグ" WHERE 分野 = %s AND 区分 = ANY(%s) ORDER BY 区分 ASC, 番号 ASC'
+                data = (bunya, list(kbn))
             else:
                 sql = 'SELECT 分野, 区分, 番号, 課目名 FROM "課目cdセグ" WHERE 分野 = %s AND 区分 = %s ORDER BY 番号'
                 data = (bunya,kbn)

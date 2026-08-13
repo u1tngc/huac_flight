@@ -81,23 +81,36 @@
             <h3>登録済み履歴の訂正</h3>
             <div class="history-list">
                 {% for list in rireki %}
-                <form method="post" action="/FL_db064">
-                    <input type="hidden" name="op" value="update">
+                <form method="post" action="/FL_db065">
                     <input type="hidden" name="ymd" value="{{ list[0] }}">
                     <input type="hidden" name="bangou" value="{{ list[1] }}">
                     <input type="hidden" name="edaban" value="{{ list[2] }}">
                     <div class="history-card">
                         <div class="history-card-header">
-                            <span class="history-date">{{ list[0] }}</span>
+                            <span class="history-date">{{ list[0][0:4] }}/{{ list[0][4:6] }}/{{ list[0][6:8] }}</span>
                             <span class="history-subject">{{ list[3] }}</span>
-                            <span class="history-instructor"><span class="field-label">教官</span>{{ list[4] }}</span>
+                            <span class="history-code">{{ list[1] }}</span>
                         </div>
-                        <p class="history-comment"><span class="field-label">枝番</span>{{ list[2] }}</p>
-                        <p class="history-comment"><span class="field-label">コメント</span>
-                            <input type="text" name="comment" value="{{ list[5] }}" maxlength="255" class="table-input">
-                        </p>
-                        <div class="button-group">
-                            <button type="submit" class="execute-button">訂正</button>
+                        <div class="history-row">
+                            <div class="history-label">教　官</div>
+                            <div class="history-value">{{ list[4] }}</div>
+                        </div>
+                        <div class="history-row">
+                            <div class="history-label">枝　番</div>
+                            <div class="history-value">{{ list[2] }}</div>
+                        </div>
+                        <div class="history-row">
+                            <div class="history-label">コメント</div>
+                            <div class="history-value">
+                                <input type="text" name="comment" value="{{ list[5] }}" maxlength="255"
+                                    class="table-input">
+                            </div>
+                        </div>
+                        <div class="history-foot">
+                            <button type="submit" name="op" value="update" class="history-button">訂　正</button>
+                            <button type="submit" name="op" value="delete" class="history-button delete"
+                                data-date="{{ list[0] }}" data-subject="{{ list[3] }}"
+                                onclick="return confirmDelete(this);">削　除</button>
                         </div>
                     </div>
                 </form>
@@ -115,6 +128,15 @@
     <footer>
         <p>&copy; 2025 Yuichi Taniguchi</p>
     </footer>
+    <script>
+        // 削除は復元不可のため、実行前に対象を明示して確認する
+        function confirmDelete(btn) {
+            const d = btn.dataset.date || "";
+            const ymd = d.length === 8 ? d.slice(0, 4) + "/" + d.slice(4, 6) + "/" + d.slice(6, 8) : d;
+            return confirm(ymd + "　" + (btn.dataset.subject || "")
+                + " の履歴を削除します。削除したデータは復元できません。よろしいですか？");
+        }
+    </script>
 </body>
 
 </html>
