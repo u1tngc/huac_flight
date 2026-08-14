@@ -45,7 +45,7 @@ def FL_login():
 @app.route('/FL_menu01', methods=['GET', 'POST'])
 def FL_menu01():
     if not session.get('user_id'):
-        return redirect(url_for('login'))
+        return redirect(url_for('FL_login'))
     user_id = session.get('user_id')  # ユーザーIDを取得
     authority = session.get('authority')  # 権限を取得
     if request.method == 'POST':
@@ -436,6 +436,11 @@ def FL_db052():
         return redirect(url_for('FL_menu01'))
     return render_template('FL_db052.html', gakuseiName=session.get(f"{user_id}_name_D002"), rireki0=session.get(f'{user_id}_rireki0_D002'), rireki1=session.get(f'{user_id}_rireki1_D002'), rireki2=session.get(f'{user_id}_rireki2_D002'), rireki3=session.get(f'{user_id}_rireki3_D002'))
 
+# セッションの有効期限をリセット
+@app.before_request
+def refresh_session():
+    session.modified = True  
+
 def session_clear(user_id):
     session.pop(f"{user_id}_gakuseiName_A001", None)
     session.pop(f"{user_id}_gakuseiID_A001", None)
@@ -451,6 +456,12 @@ def session_clear(user_id):
     session.pop(f"{user_id}_rireki1_D002", None)
     session.pop(f"{user_id}_rireki2_D002", None)
     session.pop(f"{user_id}_rireki3_D002", None)
+
+# ログアウト
+@app.route('/FL_logout')
+def FL_logout():
+    session.clear()
+    return redirect(url_for('FL_login'))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
