@@ -22,6 +22,25 @@ DB_CONFIG = {
 def hash_password(plain: str) -> str:
     return bcrypt.hashpw(plain.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
+def update_lastLogin(id):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG) 
+        with conn.cursor() as cur:
+            sql = """
+            UPDATE ユーザー管理セグ SET 最終ログイン日時 = CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Tokyo' WHERE ユーザーid = %s
+            """
+            data = (id,) 
+            cur.execute(sql, data)
+            conn.commit()
+        conn.close()
+        return 0  
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return 1
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return 2
+
 def select_user(id):
     try:
         conn = psycopg2.connect(**DB_CONFIG)  # 定数を展開して接続

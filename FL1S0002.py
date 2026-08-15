@@ -15,6 +15,7 @@ def login_check(user, password):
     stored = user_info[3]
     if bcrypt.checkpw(password.encode('utf-8'), stored.encode('utf-8')):
         return 0, user_info[2]
+        FL0S001D.update_lastLogin(user)
     else:
         return 2, 0
 
