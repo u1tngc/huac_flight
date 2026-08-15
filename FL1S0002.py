@@ -98,3 +98,19 @@ def insert_user(id, name, status_cd):
     if err == 3:
         return "入力したユーザーは登録済みです。"
     return ""    
+
+def get_userAll():
+    status_dict = {
+        0: "一般学生",
+        1: "役付学生",
+        2: "教官",
+        3: "指導員",
+        4: "指定養成教官",
+        5: "監督",
+        8: "管理者（学生）",
+        9: "管理者"
+    }
+    array = FL0S001D.get_userAll()
+    for ix1 in range(len(array)):
+        array[ix1][2] = status_dict[array[ix1][2]]
+    return array

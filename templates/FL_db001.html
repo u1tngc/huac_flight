@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUAC学科ツール 学生情報照会</title>
+    <title>HUACフライト管理ツール ユーザー情報照会</title>
     <link rel="stylesheet" href="../static/FL1C0040.css">
 </head>
 
@@ -15,8 +15,8 @@
 
     <main>
         <section class="options">
-            <h2>学生情報照会</h2>
-            <form method="post" action="/GK_db001">
+            <h2>ユーザー情報照会</h2>
+            <form method="post" action="/FL_db001">
                 <div class="data-section">
                     <table class="data-table">
                         <thead>
@@ -24,23 +24,19 @@
                                 <th>学籍番号</th>
                                 <th>氏名</th>
                                 <th>権限</th>
-                                <th>出題区分</th>
-                                <th>資格</th>
-                                {% if session['authority'] == 9 %}
+                                {% if session['authority'] in [8,9] %}
                                 <th>最終ログイン日時</th>
                                 {% endif %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in gakuseiList %}
+                            {% for list in userList %}
                             <tr>
-                                <td>{{ student[0] }}</td>
-                                <td>{{ student[1] }}</td>
-                                <td>{{ student[2] }}</td>
-                                <td>{{ student[3] }}</td>
-                                <td>{{ student[4] }}</td>
-                                {% if session['authority'] == 9 %}
-                                <td>{{ student[6] }}</td>
+                                <td>{{ list[0] }}</td>
+                                <td>{{ list[1] }}</td>
+                                <td>{{ list[2] }}</td>
+                                {% if session['authority'] in [8,9] %}
+                                <td>{{ list[3] }}</td>
                                 {% endif %}
                             </tr>
                             {% endfor %}
@@ -49,7 +45,7 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="button" onclick="location.href='/GK_menu01'" class="menu-button">戻る</button>
+                    <button type="button" onclick="location.href='/FL_menu01'" class="menu-button">戻る</button>
                 </div>
             </form>
         </section>

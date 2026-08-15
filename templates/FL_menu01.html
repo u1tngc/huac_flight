@@ -68,14 +68,15 @@
                         <label class="radio-group"><input type="radio" name="selection" value="SoloChk">単座チェック</label>
                     </div>
                 </div>
-                {% if session['authority'] in [9] %}
+                {% if session['authority'] in [1,5,8,9] %}
                 <div class="data-section">
                     <div class="radio-section">
                         <label class="radio-group"><input type="radio" name="selection" value="user_edit">ユーザー管理</label>
                         <div class="form-group">
                             <label for="db_kbn3"></label>
                             <select id="db_kbn3" name="db_kbn3">
-                                {% if session['authority'] in [9] %}
+                                <option value="0">ユーザー情報照会</option>
+                                {% if session['authority'] in [5,8,9] %}
                                 <option value="1">ユーザー情報訂正</option>
                                 <option value="2">ユーザー情報登録</option>
                                 {% endif %}

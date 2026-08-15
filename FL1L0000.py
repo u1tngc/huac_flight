@@ -76,7 +76,11 @@ def FL_menu01():
                 return render_template('FL_db023.html', gakuseiName=gakuseiName)
         elif shorikbn == "user_edit":
             dbkbn = request.form["db_kbn3"]
-            if dbkbn == "1":
+            if dbkbn == "0":
+                #機能：ユーザー情報照会(C000)
+                userList = FL1S0002.get_userAll()
+                return render_template('FL_db001.html',userList=userList)     
+            elif dbkbn == "1":
                 #機能：ユーザー情報訂正(C001)
                 userData = FL1S0002.get_user01()
                 session[f"{user_id}_userData_C001"] = userData
@@ -107,6 +111,16 @@ def FL_menu01():
             #機能：パスワード変更
             return redirect(url_for('FL_db010',err=""))
     return render_template('FL_menu01.html')
+
+#ユーザー管理セグ・照会
+@app.route('/FL_db001', methods=['GET', 'POST'])
+def FL_db001():
+    user_id = session.get('user_id')
+    if not session.get('logged_in'):
+        return redirect(url_for('GK_login'))
+    if not session.get('authority') in [1,5,8,9]:
+        return redirect(url_for('FL_menu01'))
+    return render_template('FL_db001.html')
 
 #パスワード変更
 @app.route('/FL_db010', methods=['GET', 'POST'])
@@ -330,7 +344,7 @@ def FL_db002():
     user_id = session.get('user_id')
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
-    if not session.get('authority') in [9]:
+    if not session.get('authority') in [5,8,9]:
         return redirect(url_for('FL_menu01'))
 
     if request.method == 'POST':
@@ -347,7 +361,7 @@ def FL_db003():
     user_id = session.get('user_id')
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
-    if not session.get('authority') in [9]:
+    if not session.get('authority') in [5,8,9]:
         return redirect(url_for('FL_menu01'))
 
     if request.method == 'POST':
@@ -371,7 +385,7 @@ def FL_db004():
     user_id = session.get('user_id')
     if not session.get('logged_in'):
         return redirect(url_for('FL_login'))
-    if not session.get('authority') in [9]:
+    if not session.get('authority') in [5,8,9]:
         return redirect(url_for('FL_menu01'))
 
     if request.method == 'POST':

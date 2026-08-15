@@ -162,4 +162,20 @@ def get_kyokanList():
         return []
     except Exception as e:
         print(f'エラー内容：{e}')
-        return [] 
+        return []
+
+def get_userAll():
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)  
+        with conn.cursor() as cur:
+            sql = 'SELECT ユーザーid, 氏名, 権限, 最終ログイン日時 FROM "ユーザー管理セグ"'
+            cur.execute(sql)
+            result = cur.fetchall()  
+        conn.close()
+        return [list(row) for row in result]
+    except psycopg2.Error as e:
+        print(f'エラー内容：{e}')
+        return []
+    except Exception as e:
+        print(f'エラー内容：{e}')
+        return []
