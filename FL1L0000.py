@@ -90,7 +90,7 @@ def FL_menu01():
             return render_template('FL_db041.html', kinkyuList=kinkyuList)
         elif shorikbn == "SoloChk":
             #機能：単座チェック(D002)
-            if authority not in [0,1]:
+            if authority not in [0]:
                 gakuseiName = FL1S0001.get_gakuseiInfo01()
                 session[f"{user_id}_gakuseiName_D002"] = gakuseiName
                 return render_template('FL_db051.html', gakuseiName=gakuseiName)
